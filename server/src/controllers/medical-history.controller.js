@@ -3,6 +3,7 @@ import multer from "multer";
 import { env } from "../../config/env.js";
 import { MedicalDocument, MedicalHistoryBundle, Patient, UserPatientProfile } from "../models/index.js";
 import { deleteCloudinaryFile, uploadMedicalDocument } from "../services/cloudinary.service.js";
+import { performSarvamOCR } from "../utils/ocr.utils.js";
 
 const documentTypes = ["prescription", "report", "summary"];
 const bundleTypes = ["surgery", "hospitalization", "disease", "treatment", "injury", "other"];
@@ -102,6 +103,13 @@ export async function createMedicalBundle(req, res) {
         mimeType: file.mimetype,
         originalFileName: file.originalname,
       });
+
+      const ocrResult = await performSarvamOCR(file.buffer, file.mimetype).catch(() => null);
+      let rawText = undefined;
+      if (ocrResult) {
+        rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
+      }
+
       uploaded.push({ publicId: result.public_id, resourceType: result.resource_type });
       documents.push({
         patientId: patient._id,
@@ -114,6 +122,7 @@ export async function createMedicalBundle(req, res) {
         mimeType: file.mimetype,
         fileSize: file.size,
         documentDate: req.body.documentDate ? new Date(req.body.documentDate) : undefined,
+        ocr: rawText ? { rawText } : undefined,
       });
     }
 
@@ -161,6 +170,13 @@ export async function addMedicalDocuments(req, res) {
         mimeType: file.mimetype,
         originalFileName: file.originalname,
       });
+
+      const ocrResult = await performSarvamOCR(file.buffer, file.mimetype).catch(() => null);
+      let rawText = undefined;
+      if (ocrResult) {
+        rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
+      }
+
       uploaded.push({ publicId: result.public_id, resourceType: result.resource_type });
       documents.push({
         patientId: patient._id,
@@ -173,6 +189,7 @@ export async function addMedicalDocuments(req, res) {
         mimeType: file.mimetype,
         fileSize: file.size,
         documentDate: req.body.documentDate ? new Date(req.body.documentDate) : undefined,
+        ocr: rawText ? { rawText } : undefined,
       });
     }
     const savedDocuments = await MedicalDocument.insertMany(documents);
@@ -256,6 +273,12 @@ export async function updateMedicalDocument(req, res) {
       document.originalFileName = req.file.originalname;
       document.mimeType = req.file.mimetype;
       document.fileSize = req.file.size;
+
+      const ocrResult = await performSarvamOCR(req.file.buffer, req.file.mimetype).catch(() => null);
+      if (ocrResult) {
+        document.ocr = document.ocr || {};
+        document.ocr.rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
+      }
     }
     document.documentType = documentType;
     if (req.body.documentDate) document.documentDate = new Date(req.body.documentDate);
