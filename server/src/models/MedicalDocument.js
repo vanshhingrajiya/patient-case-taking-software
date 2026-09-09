@@ -118,6 +118,11 @@ const medicalDocumentSchema = new mongoose.Schema(
       required: true,
     },
 
+    resourceType: {
+      type: String,
+      enum: ["image", "raw", "video", "auto"],
+    },
+
     originalFileName: {
       type: String,
     },

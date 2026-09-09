@@ -2,11 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FileHeart,
-  AlertTriangle,
   Pill,
   Activity,
   PlusCircle,
-  Clock,
   CheckCircle,
   FileText,
   Calendar,
@@ -16,7 +14,12 @@ import { RiAddLine } from "@remixicon/react";
 import { DashboardLayout } from "../../components/DashboardLayout";
 import { MedicalBundleForm } from "../../components/medical/MedicalBundleForm";
 import { MedicalHistoryBundleCard } from "../../components/medical/MedicalHistoryBundleCard";
-import { getMedicalHistory } from "../../services";
+import { deleteMedicalBundle, deleteMedicalDocument, getMedicalHistory } from "../../services";
+import { MedicalBundleEditDialog } from "../../components/medical/MedicalBundleEditDialog";
+import { MedicalDocumentEditDialog } from "../../components/medical/MedicalDocumentEditDialog";
+import { MedicalDocumentPreviewDialog } from "../../components/medical/MedicalDocumentPreviewDialog";
+import { MedicalDocumentAddDialog } from "../../components/medical/MedicalDocumentAddDialog";
+import { MedicalBundleDocumentsDialog } from "../../components/medical/MedicalBundleDocumentsDialog";
 
 export function MedicalHistory() {
   const navigate = useNavigate();
@@ -24,6 +27,11 @@ export function MedicalHistory() {
   const [bundlesLoading, setBundlesLoading] = useState(true);
   const [bundlesError, setBundlesError] = useState("");
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [editingBundle, setEditingBundle] = useState(null);
+  const [editingDocument, setEditingDocument] = useState(null);
+  const [previewingDocument, setPreviewingDocument] = useState(null);
+  const [addingDocuments, setAddingDocuments] = useState(null);
+  const [viewingBundleId, setViewingBundleId] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -44,6 +52,44 @@ export function MedicalHistory() {
       active = false;
     };
   }, []);
+
+  const removeDocument = async (documentId) => {
+    if (!window.confirm("Delete this medical document permanently?")) return;
+    try {
+      await deleteMedicalDocument(documentId);
+      setBundles((current) => current.map((bundle) => ({ ...bundle, documents: bundle.documents.filter((document) => document._id !== documentId) })).filter((bundle) => bundle.documents.length));
+    } catch (reason) {
+      setBundlesError(reason.message || "Unable to delete the document.");
+    }
+  };
+
+  const removeBundle = async (bundleId) => {
+    if (!window.confirm("Delete this medical history bundle? All documents inside this bundle will also be permanently deleted.")) return;
+    try {
+      await deleteMedicalBundle(bundleId);
+      setBundles((current) => current.filter((bundle) => bundle._id !== bundleId));
+    } catch (reason) {
+      setBundlesError(reason.message || "Unable to delete the bundle.");
+    }
+  };
+
+  const replaceDocument = (updatedDocument) => {
+    setBundles((current) => current.map((bundle) => ({ ...bundle, documents: bundle.documents.map((document) => document._id === updatedDocument._id ? updatedDocument : document) })));
+    setEditingDocument(null);
+  };
+
+  const replaceBundle = (updatedBundle) => {
+    setBundles((current) => current.map((bundle) => bundle._id === updatedBundle._id ? { ...bundle, ...updatedBundle } : bundle));
+    setEditingBundle(null);
+  };
+
+  const appendDocuments = (documents) => {
+    if (!addingDocuments) return;
+    setBundles((current) => current.map((bundle) => bundle._id === addingDocuments.bundle._id ? { ...bundle, documents: [...(bundle.documents || []), ...documents] } : bundle));
+    setAddingDocuments(null);
+  };
+
+  const viewingBundle = bundles.find((bundle) => bundle._id === viewingBundleId);
 
   const [conditions] = useState([
     {
@@ -156,10 +202,15 @@ export function MedicalHistory() {
           {bundlesLoading && <p className="mt-4 text-sm text-gray-500">Loading medical documents...</p>}
           {!bundlesLoading && bundlesError && <p className="mt-4 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">{bundlesError}</p>}
           {!bundlesLoading && !bundlesError && bundles.length === 0 && <p className="mt-4 text-sm text-gray-500">No uploaded medical documents yet.</p>}
-          {!bundlesLoading && !bundlesError && bundles.length > 0 && <div className="mt-4 grid gap-4">{bundles.map((bundle) => <MedicalHistoryBundleCard key={bundle._id} bundle={bundle} />)}</div>}
+          {!bundlesLoading && !bundlesError && bundles.length > 0 && <div className="mt-4 grid items-start gap-4 md:grid-cols-2">{bundles.map((bundle) => <MedicalHistoryBundleCard key={bundle._id} bundle={bundle} onDeleteBundle={removeBundle} onUpdate={setEditingBundle} onViewBundle={(selectedBundle) => setViewingBundleId(selectedBundle._id)} />)}</div>}
         </div>
 
         {uploadOpen && <MedicalBundleForm onClose={() => setUploadOpen(false)} onCreated={(bundle) => { setBundles((current) => [bundle, ...current]); setUploadOpen(false); }} />}
+        {editingDocument && <MedicalDocumentEditDialog document={editingDocument} onClose={() => setEditingDocument(null)} onUpdated={replaceDocument} />}
+        {previewingDocument && <MedicalDocumentPreviewDialog document={previewingDocument} onClose={() => setPreviewingDocument(null)} />}
+        {addingDocuments && <MedicalDocumentAddDialog bundle={addingDocuments.bundle} documentType={addingDocuments.documentType} onClose={() => setAddingDocuments(null)} onAdded={appendDocuments} />}
+        {editingBundle && <MedicalBundleEditDialog bundle={editingBundle} onClose={() => setEditingBundle(null)} onUpdated={replaceBundle} />}
+        {viewingBundle && <MedicalBundleDocumentsDialog bundle={viewingBundle} onClose={() => setViewingBundleId(null)} onDelete={removeDocument} onUpdateDocument={setEditingDocument} onViewDocument={setPreviewingDocument} onAddDocuments={(selectedBundle, documentType) => setAddingDocuments({ bundle: selectedBundle, documentType })} />}
 
         {/* Section 1: Chronic Conditions & Medical Diagnoses */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-2xs">

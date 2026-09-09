@@ -14,7 +14,7 @@ export function DocumentUploadSection({ label, type, files, onAdd, onRemove }) {
         <Button
           type="button"
           variant="outline"
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#b8d5ce] bg-white px-3 py-2 text-xs font-bold text-[#0c5e5b] hover:bg-[#e2f2ef] cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[#b8d5ce] bg-white px-3 py-2 text-xs font-bold text-[#0c5e5b] hover:bg-[#e2f2ef] cursor-pointer"
           onClick={() => document.getElementById(inputId)?.click()}
         >
           <RiAddLine className="size-4" />
