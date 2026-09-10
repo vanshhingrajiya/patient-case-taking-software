@@ -158,34 +158,16 @@ const medicalDocumentSchema = new mongoose.Schema(
       },
     },
 
-    // Information extracted from document
+    // Analysis tracking
+    analysisStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed"],
+      default: "pending",
+    },
+
+    // Information extracted from document by LLM
     extractedData: {
-      diagnoses: [String],
-
-      medications: [
-        {
-          drugName: String,
-          dosage: String,
-          frequency: String,
-          duration: String,
-        },
-      ],
-
-      investigations: [
-        {
-          testName: String,
-          observedValue: String,
-          unit: String,
-          referenceRange: String,
-
-          isAbnormal: {
-            type: Boolean,
-            default: false,
-          },
-        },
-      ],
-
-      potentialDrugInteractions: [String],
+      type: Object,
     },
   },
   {

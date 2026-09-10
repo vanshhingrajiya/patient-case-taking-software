@@ -3,7 +3,7 @@ import multer from "multer";
 import { env } from "../../config/env.js";
 import { MedicalDocument, MedicalHistoryBundle, Patient, UserPatientProfile } from "../models/index.js";
 import { deleteCloudinaryFile, uploadMedicalDocument } from "../services/cloudinary.service.js";
-import { performSarvamOCR } from "../utils/ocr.utils.js";
+import { processMedicalDocumentBackground } from "../services/medical-document.service.js";
 
 const documentTypes = ["prescription", "report", "summary"];
 const bundleTypes = ["surgery", "hospitalization", "disease", "treatment", "injury", "other"];
@@ -104,12 +104,6 @@ export async function createMedicalBundle(req, res) {
         originalFileName: file.originalname,
       });
 
-      const ocrResult = await performSarvamOCR(file.buffer, file.mimetype).catch(() => null);
-      let rawText = undefined;
-      if (ocrResult) {
-        rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
-      }
-
       uploaded.push({ publicId: result.public_id, resourceType: result.resource_type });
       documents.push({
         patientId: patient._id,
@@ -122,13 +116,19 @@ export async function createMedicalBundle(req, res) {
         mimeType: file.mimetype,
         fileSize: file.size,
         documentDate: req.body.documentDate ? new Date(req.body.documentDate) : undefined,
-        ocr: rawText ? { rawText } : undefined,
+        analysisStatus: "pending",
       });
     }
 
     const savedDocuments = await MedicalDocument.insertMany(documents);
     patient.bundles.push(bundle._id);
     await patient.save();
+
+    // Trigger background processing
+    savedDocuments.forEach((doc, index) => {
+      processMedicalDocumentBackground(doc._id, files[index].buffer, files[index].mimetype);
+    });
+
     return res.status(201).json({ bundle: { ...bundle.toObject(), documents: savedDocuments } });
   } catch (error) {
     await Promise.all(uploaded.map((file) => deleteCloudinaryFile(file.publicId, file.resourceType).catch(() => null)));
@@ -171,12 +171,6 @@ export async function addMedicalDocuments(req, res) {
         originalFileName: file.originalname,
       });
 
-      const ocrResult = await performSarvamOCR(file.buffer, file.mimetype).catch(() => null);
-      let rawText = undefined;
-      if (ocrResult) {
-        rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
-      }
-
       uploaded.push({ publicId: result.public_id, resourceType: result.resource_type });
       documents.push({
         patientId: patient._id,
@@ -189,10 +183,16 @@ export async function addMedicalDocuments(req, res) {
         mimeType: file.mimetype,
         fileSize: file.size,
         documentDate: req.body.documentDate ? new Date(req.body.documentDate) : undefined,
-        ocr: rawText ? { rawText } : undefined,
+        analysisStatus: "pending",
       });
     }
     const savedDocuments = await MedicalDocument.insertMany(documents);
+    
+    // Trigger background processing
+    savedDocuments.forEach((doc, index) => {
+      processMedicalDocumentBackground(doc._id, req.files[index].buffer, req.files[index].mimetype);
+    });
+
     return res.status(201).json({ documents: savedDocuments });
   } catch (error) {
     await Promise.all(uploaded.map((file) => deleteCloudinaryFile(file.publicId, file.resourceType).catch(() => null)));
@@ -273,16 +273,15 @@ export async function updateMedicalDocument(req, res) {
       document.originalFileName = req.file.originalname;
       document.mimeType = req.file.mimetype;
       document.fileSize = req.file.size;
-
-      const ocrResult = await performSarvamOCR(req.file.buffer, req.file.mimetype).catch(() => null);
-      if (ocrResult) {
-        document.ocr = document.ocr || {};
-        document.ocr.rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
-      }
+      document.analysisStatus = "pending";
     }
     document.documentType = documentType;
     if (req.body.documentDate) document.documentDate = new Date(req.body.documentDate);
     await document.save();
+
+    if (req.file) {
+      processMedicalDocumentBackground(document._id, req.file.buffer, req.file.mimetype);
+    }
   } catch (error) {
     if (replacement) await deleteCloudinaryFile(replacement.public_id, replacement.resource_type).catch(() => null);
     return res.status(502).json({ message: error.message || "Unable to update the medical document." });
