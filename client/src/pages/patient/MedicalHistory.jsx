@@ -16,8 +16,6 @@ import { MedicalBundleForm } from "../../components/medical/MedicalBundleForm";
 import { MedicalHistoryBundleCard } from "../../components/medical/MedicalHistoryBundleCard";
 import { deleteMedicalBundle, deleteMedicalDocument, getMedicalHistory } from "../../services";
 import { MedicalBundleEditDialog } from "../../components/medical/MedicalBundleEditDialog";
-import { MedicalDocumentEditDialog } from "../../components/medical/MedicalDocumentEditDialog";
-import { MedicalDocumentPreviewDialog } from "../../components/medical/MedicalDocumentPreviewDialog";
 import { MedicalDocumentAddDialog } from "../../components/medical/MedicalDocumentAddDialog";
 import { MedicalBundleDocumentsDialog } from "../../components/medical/MedicalBundleDocumentsDialog";
 
@@ -28,8 +26,6 @@ export function MedicalHistory() {
   const [bundlesError, setBundlesError] = useState("");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editingBundle, setEditingBundle] = useState(null);
-  const [editingDocument, setEditingDocument] = useState(null);
-  const [previewingDocument, setPreviewingDocument] = useState(null);
   const [addingDocuments, setAddingDocuments] = useState(null);
   const [viewingBundleId, setViewingBundleId] = useState(null);
 
@@ -75,7 +71,6 @@ export function MedicalHistory() {
 
   const replaceDocument = (updatedDocument) => {
     setBundles((current) => current.map((bundle) => ({ ...bundle, documents: bundle.documents.map((document) => document._id === updatedDocument._id ? updatedDocument : document) })));
-    setEditingDocument(null);
   };
 
   const replaceBundle = (updatedBundle) => {
@@ -206,11 +201,9 @@ export function MedicalHistory() {
         </div>
 
         {uploadOpen && <MedicalBundleForm onClose={() => setUploadOpen(false)} onCreated={(bundle) => { setBundles((current) => [bundle, ...current]); setUploadOpen(false); }} />}
-        {editingDocument && <MedicalDocumentEditDialog document={editingDocument} onClose={() => setEditingDocument(null)} onUpdated={replaceDocument} />}
-        {previewingDocument && <MedicalDocumentPreviewDialog document={previewingDocument} onClose={() => setPreviewingDocument(null)} />}
         {addingDocuments && <MedicalDocumentAddDialog bundle={addingDocuments.bundle} documentType={addingDocuments.documentType} onClose={() => setAddingDocuments(null)} onAdded={appendDocuments} />}
         {editingBundle && <MedicalBundleEditDialog bundle={editingBundle} onClose={() => setEditingBundle(null)} onUpdated={replaceBundle} />}
-        {viewingBundle && <MedicalBundleDocumentsDialog bundle={viewingBundle} onClose={() => setViewingBundleId(null)} onDelete={removeDocument} onUpdateDocument={setEditingDocument} onViewDocument={setPreviewingDocument} onAddDocuments={(selectedBundle, documentType) => setAddingDocuments({ bundle: selectedBundle, documentType })} />}
+        {viewingBundle && <MedicalBundleDocumentsDialog bundle={viewingBundle} onClose={() => setViewingBundleId(null)} onDelete={removeDocument} onDocumentUpdated={replaceDocument} onAddDocuments={(selectedBundle, documentType) => setAddingDocuments({ bundle: selectedBundle, documentType })} />}
 
         {/* Section 1: Chronic Conditions & Medical Diagnoses */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-2xs">
