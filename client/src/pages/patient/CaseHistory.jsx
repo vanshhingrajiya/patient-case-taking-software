@@ -21,8 +21,12 @@ import {
   Languages,
   X,
   Clipboard,
+  UploadCloud,
+  LoaderCircle,
+  FileSearch,
 } from "lucide-react";
 import { DashboardLayout } from "../../components/DashboardLayout";
+import { summarizeCaseReport } from "../../services";
 
 const LANGUAGE_NAMES = {
   "en-IN": "English",
@@ -154,6 +158,8 @@ export function CaseHistory() {
   const [selectedCase, setSelectedCase] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
   const [modalViewMode, setModalViewMode] = useState("structured"); // "structured" | "raw"
+  const [uploadingCaseId, setUploadingCaseId] = useState(null);
+  const [reportError, setReportError] = useState("");
 
   // Load cases from localStorage on mount
   useEffect(() => {
@@ -216,6 +222,43 @@ export function CaseHistory() {
     localStorage.removeItem("medikiosk_latest_summary");
     localStorage.removeItem("medikiosk_latest_summary_raw");
     setSelectedCase(null);
+  };
+
+  const handleReportUpload = async (event, caseItem) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+      setReportError("Choose a PDF, JPG, or PNG medical report.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setReportError("The report must be smaller than 10 MB.");
+      return;
+    }
+
+    setReportError("");
+    setUploadingCaseId(caseItem.id);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("caseSummary", caseItem.markdown || caseItem.summary || "");
+      const result = await summarizeCaseReport(formData);
+      const report = { ...result.report, id: `${Date.now()}-${file.name}`, uploadedAt: new Date().toISOString() };
+      const updatedCase = {
+        ...caseItem,
+        reportSummaries: [report, ...(caseItem.reportSummaries || [])],
+      };
+      const updatedCases = cases.map((item) => (item.id === caseItem.id ? updatedCase : item));
+      setCases(updatedCases);
+      setSelectedCase(updatedCase);
+      localStorage.setItem("medikiosk_case_history", JSON.stringify(updatedCases));
+    } catch (error) {
+      setReportError(error.message || "Unable to analyze this report right now.");
+    } finally {
+      setUploadingCaseId(null);
+    }
   };
 
   // Helper to extract case details for card preview
@@ -532,6 +575,44 @@ export function CaseHistory() {
 
               {/* Modal Body */}
               <div className="overflow-y-auto p-5 sm:p-7 flex-1">
+                <section className="mb-5 rounded-2xl border border-[#bcded7] bg-[#f7fcfb] p-4 sm:p-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0c5e5b]">
+                        <FileSearch className="size-4" /> Report analysis
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-gray-600">Upload a PDF or image report to extract its text and create a case-aware summary.</p>
+                    </div>
+                    <label className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0c5e5b] px-3.5 py-2.5 text-xs font-bold text-white transition ${uploadingCaseId === selectedCase.id ? "cursor-wait opacity-70" : "cursor-pointer hover:bg-[#084341]"}`}>
+                      {uploadingCaseId === selectedCase.id ? <LoaderCircle className="size-4 animate-spin" /> : <UploadCloud className="size-4" />}
+                      {uploadingCaseId === selectedCase.id ? "Reading report…" : "Upload report"}
+                      <input
+                        type="file"
+                        accept="application/pdf,image/jpeg,image/jpg,image/png"
+                        className="sr-only"
+                        disabled={uploadingCaseId === selectedCase.id}
+                        onChange={(event) => handleReportUpload(event, selectedCase)}
+                      />
+                    </label>
+                  </div>
+                  {reportError && <p className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">{reportError}</p>}
+                  {selectedCase.reportSummaries?.length > 0 && (
+                    <div className="mt-4 space-y-3">
+                      {selectedCase.reportSummaries.map((report) => (
+                        <article key={report.id} className="rounded-xl border border-gray-200 bg-white p-3.5">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="flex items-center gap-2 text-xs font-bold text-gray-900"><FileText className="size-4 text-[#0c5e5b]" />{report.fileName}</p>
+                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold capitalize ${report.analysis?.overall_status === "critical" ? "bg-red-100 text-red-700" : report.analysis?.overall_status === "abnormal" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-700"}`}>{report.analysis?.overall_status || "review"}</span>
+                          </div>
+                          <p className="mt-2 text-sm leading-relaxed text-gray-800">{report.analysis?.clinical_summary || "Report summary unavailable."}</p>
+                          {report.analysis?.key_findings?.length > 0 && <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-gray-700">{report.analysis.key_findings.map((finding) => <li key={finding}>{finding}</li>)}</ul>}
+                          <p className="mt-2 border-t border-gray-100 pt-2 text-xs text-gray-600"><span className="font-bold text-[#0c5e5b]">Case relevance:</span> {report.analysis?.case_relevance || "No direct relationship documented."}</p>
+                          {report.analysis?.requires_review && <p className="mt-2 text-xs font-semibold text-amber-700">Some extracted information needs clinical verification.</p>}
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </section>
                 {modalViewMode === "raw" ? (
                   <pre className="whitespace-pre-wrap font-mono text-xs sm:text-sm leading-relaxed text-gray-800 bg-gray-50 border border-gray-200 rounded-2xl p-5 overflow-x-auto">
                     {selectedCase.markdown}

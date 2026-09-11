@@ -18,7 +18,6 @@ import { DashboardLayout } from "../../components/DashboardLayout";
 const languageNames = {
   hi: "Hindi (हिन्दी)",
   en: "English",
-  bn: "Bengali (বাংলা)",
   mr: "Marathi (मराठी)",
   te: "Telugu (తెలుగు)",
   ta: "Tamil (தமிழ்)",

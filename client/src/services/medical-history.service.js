@@ -29,6 +29,12 @@ export const medicalHistoryService = {
 
   deleteMedicalBundle: (bundleId) =>
     request(`/medical-history/bundle/${bundleId}`, { method: "DELETE" }),
+
+  summarizeCaseReport: (formData) =>
+    request("/util/case-report-summary", {
+      method: "POST",
+      body: formData,
+    }),
 };
 
 export const {
@@ -39,6 +45,7 @@ export const {
   updateMedicalDocument,
   updateMedicalBundle,
   deleteMedicalBundle,
+  summarizeCaseReport,
 } = medicalHistoryService;
 
 export default medicalHistoryService;

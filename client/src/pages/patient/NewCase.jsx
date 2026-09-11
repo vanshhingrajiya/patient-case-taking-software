@@ -29,7 +29,6 @@ const API = (import.meta.env.VITE_INTAKE_API_URL || "http://127.0.0.1:8000").rep
 const CONVERSATION_LANGUAGES = [
   ["hi-IN", "हिन्दी"],
   ["en-IN", "English"],
-  ["bn-IN", "বাংলা"],
   ["mr-IN", "मराठी"],
   ["ta-IN", "தமிழ்"],
   ["te-IN", "తెలుగు"],
@@ -40,7 +39,7 @@ const CONVERSATION_LANGUAGES = [
   ["od-IN", "ଓଡ଼ିଆ"],
 ];
 const CONTEXT_TO_SARVAM_LANGUAGE = {
-  en: "en-IN", hi: "hi-IN", bn: "bn-IN", mr: "mr-IN", ta: "ta-IN",
+  en: "en-IN", hi: "hi-IN", mr: "mr-IN", ta: "ta-IN",
   te: "te-IN", gu: "gu-IN", kn: "kn-IN", ml: "ml-IN", pa: "pa-IN", or: "od-IN",
   as: "en-IN",
 };
