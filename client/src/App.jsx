@@ -23,6 +23,8 @@ import { CaseHistory } from "./pages/patient/CaseHistory";
 
 // 2. Doctor Pages
 import { DoctorDashboard } from "./pages/doctor/DoctorDashboard";
+import { DoctorPatientRecords } from "./pages/doctor/DoctorPatientRecords";
+import { DoctorProfile } from "./pages/doctor/DoctorProfile";
 
 // 3. Kiosk Pages
 import { KioskDashboard } from "./pages/kiosk/KioskDashboard";
@@ -109,16 +111,8 @@ export default function App() {
             />
           }
         />
-        <Route
-          path="/doctor/patients"
-          element={
-            <UnderConstruction
-              title="Patient Records"
-              description="ABDM longitudinal patient records integration is in progress."
-              moduleName="DOCTOR / PATIENTS"
-            />
-          }
-        />
+        <Route path="/doctor/patients" element={<DoctorPatientRecords />} />
+        <Route path="/doctor/profile" element={<DoctorProfile />} />
         <Route
           path="/doctor/prescriptions"
           element={
