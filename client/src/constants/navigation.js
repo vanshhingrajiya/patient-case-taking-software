@@ -59,19 +59,14 @@ export const ROLE_NAVIGATION = Object.freeze({
       icon: LayoutDashboard,
     },
     {
-      label: "Consultation Queue",
-      path: "/doctor/queue",
-      icon: Users,
-    },
-    {
       label: "Patient Records",
       path: "/doctor/patients",
       icon: ClipboardList,
     },
     {
-      label: "Prescriptions",
-      path: "/doctor/prescriptions",
-      icon: FileText,
+      label: "My Profile",
+      path: "/doctor/profile",
+      icon: UserCircle,
     },
   ],
   [ROLES.KIOSK]: [
