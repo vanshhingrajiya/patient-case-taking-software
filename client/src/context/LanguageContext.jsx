@@ -5,7 +5,6 @@ import { useAuth } from "./AuthContext";
 export const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English", nativeName: "English", isDefault: true },
   { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
-  { code: "bn", name: "Bengali", nativeName: "বাংলা" },
   { code: "gu", name: "Gujarati", nativeName: "ગુજરાતી" },
   { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ" },
   { code: "ml", name: "Malayalam", nativeName: "മലയാളം" },
@@ -22,6 +21,19 @@ export const LanguageContext = createContext({
   changeLanguage: () => {},
   languages: SUPPORTED_LANGUAGES,
 });
+
+const LANGUAGE_PREFERENCE_KEY = "medikiosk_language";
+const LANGUAGE_PREFERENCE_CONFIRMED_KEY = "medikiosk_language_preference_confirmed";
+
+function getSavedLanguagePreference() {
+  if (typeof window === "undefined") return "en";
+
+  const savedLanguage = localStorage.getItem(LANGUAGE_PREFERENCE_KEY);
+  const wasExplicitlyChosen = localStorage.getItem(LANGUAGE_PREFERENCE_CONFIRMED_KEY) === "true";
+  return wasExplicitlyChosen && SUPPORTED_LANGUAGES.some((language) => language.code === savedLanguage)
+    ? savedLanguage
+    : "en";
+}
 
 /**
  * Cookie helpers for Google Translate element integration
@@ -69,13 +81,7 @@ export function LanguageProvider({ children }) {
   const [, startTransition] = useTransition();
 
   const [currentLanguage, setCurrentLanguage] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("medikiosk_language");
-      if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
-        return saved;
-      }
-    }
-    return "en";
+    return getSavedLanguagePreference();
   });
 
   // Apply Google Translate translation whenever currentLanguage changes or widget becomes ready
@@ -105,17 +111,22 @@ export function LanguageProvider({ children }) {
     };
   }, [currentLanguage]);
 
-  // Sync preference if logged-in patient has a stored preference
+  // A patient's saved profile preference is the source of truth after sign-in.
+  // Guests and users without a preference stay with their explicitly saved local choice,
+  // which defaults to English on first visit.
   useEffect(() => {
-    const patientLang = user?.patient?.preferences?.preferredLanguage;
+    const patientLang =
+      user?.patient?.preferences?.preferredLanguage ||
+      user?.patient?.preferredLanguage ||
+      user?.preferredLanguage;
     if (patientLang && SUPPORTED_LANGUAGES.some((l) => l.code === patientLang)) {
-      const localLang = localStorage.getItem("medikiosk_language");
-      if (!localLang || localLang === "en") {
+      if (currentLanguage !== patientLang) {
         setCurrentLanguage(patientLang);
-        localStorage.setItem("medikiosk_language", patientLang);
+        localStorage.setItem(LANGUAGE_PREFERENCE_KEY, patientLang);
+        localStorage.setItem(LANGUAGE_PREFERENCE_CONFIRMED_KEY, "true");
       }
     }
-  }, [user]);
+  }, [user, currentLanguage]);
 
   const changeLanguage = useCallback(
     async (langCode) => {
@@ -126,7 +137,8 @@ export function LanguageProvider({ children }) {
       });
 
       if (typeof window !== "undefined") {
-        localStorage.setItem("medikiosk_language", langCode);
+        localStorage.setItem(LANGUAGE_PREFERENCE_KEY, langCode);
+        localStorage.setItem(LANGUAGE_PREFERENCE_CONFIRMED_KEY, "true");
       }
 
       if (langCode === "en") {

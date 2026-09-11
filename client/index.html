@@ -13,12 +13,31 @@
   <div id="root"></div>
 
   <script type="text/javascript">
+    // Prevent a stale Google Translate cookie (for example, Bengali) from choosing
+    // a language before React has loaded an explicit user or profile preference.
+    (function setInitialTranslateLanguage() {
+      var supportedLanguages = ["en", "hi", "gu", "kn", "ml", "mr", "ta", "te", "or", "as", "pa"];
+      var savedLanguage = localStorage.getItem("medikiosk_language");
+      var hasExplicitPreference = localStorage.getItem("medikiosk_language_preference_confirmed") === "true";
+      var language = hasExplicitPreference && supportedLanguages.indexOf(savedLanguage) !== -1 ? savedLanguage : "en";
+      var cookieValue = "googtrans=/en/" + language + "; path=/;";
+      document.cookie = cookieValue;
+
+      var host = window.location.hostname;
+      if (host && host !== "localhost" && host.indexOf("127.") !== 0) {
+        var parts = host.split(".");
+        if (parts.length > 1) {
+          document.cookie = cookieValue + " domain=." + parts.slice(-2).join(".") + ";";
+        }
+      }
+    })();
+
     function googleTranslateElementInit() {
       if (window.google && window.google.translate) {
         new window.google.translate.TranslateElement(
           {
             pageLanguage: "en",
-            includedLanguages: "en,hi,bn,gu,kn,ml,mr,ta,te,or,as,pa",
+            includedLanguages: "en,hi,gu,kn,ml,mr,ta,te,or,as,pa",
             autoDisplay: false,
           },
           "google_translate_element"

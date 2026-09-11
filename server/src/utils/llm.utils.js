@@ -142,3 +142,46 @@ export async function extractMedicalDataFromOCR(ocrText) {
     throw error;
   }
 }
+
+export async function summarizeReportForCase(caseSummary, ocrText) {
+  if (!ocrText || typeof ocrText !== "string" || !ocrText.trim()) {
+    throw new Error("Invalid or empty OCR text provided");
+  }
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3.6-flash",
+    generationConfig: { responseMimeType: "application/json" },
+  });
+
+  const prompt = `You are a medical document summarization assistant. Compare the uploaded report OCR with the patient case summary below.
+
+Safety rules:
+- Use only facts explicitly present in the case summary or OCR.
+- Do not diagnose, prescribe treatment, or claim that the report caused a symptom.
+- Mark uncertain or illegible information as needing review.
+- Keep the summary concise and clinician-friendly.
+
+Return exactly this JSON shape:
+{
+  "report_type": "laboratory report | imaging report | prescription | discharge summary | clinical note | other | unknown",
+  "overall_status": "normal | abnormal | critical | informational | uncertain",
+  "clinical_summary": "Concise summary of the uploaded report",
+  "key_findings": ["fact from the report"],
+  "case_relevance": "How the documented findings relate to the supplied case, or 'No direct relationship documented.'",
+  "requires_review": false
+}
+
+Patient case summary:
+${caseSummary || "No case summary supplied."}
+
+Uploaded report OCR:
+${ocrText}`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text());
+  } catch (error) {
+    console.error("Error in summarizeReportForCase:", error);
+    throw error;
+  }
+}

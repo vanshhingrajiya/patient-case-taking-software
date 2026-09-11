@@ -239,7 +239,7 @@ export async function validatePatientRegistration(req, res) {
     }
 
     if (preferredLanguage) {
-      const allowedLanguages = ["en", "hi", "bn", "gu", "kn", "ml", "mr", "ta", "te", "or", "as", "pa"];
+      const allowedLanguages = ["en", "hi","gu", "kn", "ml", "mr", "ta", "te", "or", "as", "pa"];
       if (!allowedLanguages.includes(preferredLanguage)) {
         errors.preferredLanguage = "Please select a supported language.";
       }
@@ -438,7 +438,7 @@ export function logout(req, res) {
 export async function updatePreferredLanguage(req, res) {
   try {
     const { preferredLanguage } = req.body;
-    const allowed = ["en", "hi", "bn", "gu", "kn", "ml", "mr", "ta", "te", "or", "as", "pa"];
+    const allowed = ["en", "hi", "gu", "kn", "ml", "mr", "ta", "te", "or", "as", "pa"];
     if (!allowed.includes(preferredLanguage)) {
       return res.status(400).json({ message: "Invalid language selection." });
     }
