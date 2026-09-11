@@ -115,7 +115,6 @@ const BODY_MAP_TRIGGER_TEXTS = {
 const ANALYZING_TEXTS = {
   en: { title: "Analyzing your response…", subtitle: "Reviewing symptoms and preparing your next clinical question" },
   hi: { title: "आपके उत्तर का विश्लेषण किया जा रहा है…", subtitle: "लक्षणों की समीक्षा और अगला प्रश्न तैयार किया जा रहा है" },
-  bn: { title: "আপনার উত্তর বিশ্লেষণ করা হচ্ছে…", subtitle: "উপসর্গ পর্যালোচনা এবং পরবর্তী প্রশ্ন তৈরি করা হচ্ছে" },
   mr: { title: "तुमच्या उत्तराचे विश्लेषण केले जात आहे…", subtitle: "लक्षणांचे पुनरावलोकन आणि पुढील प्रश्न तयार केला जात आहे" },
   ta: { title: "உங்கள் பதில் பகுப்பாய்வு செய்யப்படுகிறது…", subtitle: "அறிகுறிகள் மதிப்பாய்வு செய்யப்படுகின்றன" },
   te: { title: "మీ సమాధానాన్ని విశ్లేషిస్తున్నాము…", subtitle: "లక్షణాలను పరిశీలించి తదుపరి ప్రశ్నను సిద్ధం చేస్తున్నాము" },
@@ -206,23 +205,23 @@ function parseClinicalSummary(input) {
 
     const listItems = isList
       ? lines.map((l) => {
-          const clean = l.replace(/^[-*•]\s*/, "").trim();
-          const colonIdx = clean.indexOf(":");
-          if (colonIdx !== -1) {
-            return {
-              isKeyValue: true,
-              key: clean.slice(0, colonIdx).trim(),
-              value: clean.slice(colonIdx + 1).trim(),
-              raw: clean,
-            };
-          }
+        const clean = l.replace(/^[-*•]\s*/, "").trim();
+        const colonIdx = clean.indexOf(":");
+        if (colonIdx !== -1) {
           return {
-            isKeyValue: false,
-            key: "",
-            value: clean,
+            isKeyValue: true,
+            key: clean.slice(0, colonIdx).trim(),
+            value: clean.slice(colonIdx + 1).trim(),
             raw: clean,
           };
-        })
+        }
+        return {
+          isKeyValue: false,
+          key: "",
+          value: clean,
+          raw: clean,
+        };
+      })
       : [];
 
     const lowerAns = rawAnswer.toLowerCase();
@@ -309,7 +308,7 @@ function ClinicalSummaryCard({ summary, copied, onCopy }) {
   // Extract Chief Complaint and HPI separately if present for top highlighted presentation
   const chiefComplaintSec = sections.find((s) => s.title.toLowerCase().includes("chief complaint"));
   const hpiSec = sections.find((s) => s.title.toLowerCase().includes("present illness") || s.title.toLowerCase().includes("hpi"));
-  
+
   // Categorize remaining sections
   const otherSections = sections.filter(
     (s) => s !== chiefComplaintSec && s !== hpiSec
@@ -350,22 +349,20 @@ function ClinicalSummaryCard({ summary, copied, onCopy }) {
             <button
               type="button"
               onClick={() => setViewMode("structured")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
-                viewMode === "structured"
+              className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${viewMode === "structured"
                   ? "bg-white text-[#0c5e5b] shadow-xs"
                   : "text-white/80 hover:text-white"
-              }`}
+                }`}
             >
               Structured
             </button>
             <button
               type="button"
               onClick={() => setViewMode("raw")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
-                viewMode === "raw"
+              className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${viewMode === "raw"
                   ? "bg-white text-[#0c5e5b] shadow-xs"
                   : "text-white/80 hover:text-white"
-              }`}
+                }`}
             >
               Raw Text
             </button>
@@ -432,9 +429,8 @@ function ClinicalSummaryCard({ summary, copied, onCopy }) {
               return (
                 <div
                   key={idx}
-                  className={`rounded-2xl border border-gray-200/90 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between ${
-                    sec.isList ? "md:col-span-2" : ""
-                  }`}
+                  className={`rounded-2xl border border-gray-200/90 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between ${sec.isList ? "md:col-span-2" : ""
+                    }`}
                 >
                   <div>
                     {/* Section Header (Title bw ** **) */}
@@ -466,11 +462,10 @@ function ClinicalSummaryCard({ summary, copied, onCopy }) {
                               >
                                 <span className="font-semibold text-gray-700">{item.key}</span>
                                 <span
-                                  className={`rounded-md px-2 py-0.5 font-bold text-[11px] ${
-                                    isNeg
+                                  className={`rounded-md px-2 py-0.5 font-bold text-[11px] ${isNeg
                                       ? "bg-gray-200/80 text-gray-600"
                                       : "bg-[#e2f2ef] text-[#0c5e5b]"
-                                  }`}
+                                    }`}
                                 >
                                   {item.value}
                                 </span>
