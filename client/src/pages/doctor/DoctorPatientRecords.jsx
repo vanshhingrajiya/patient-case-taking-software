@@ -1,57 +1,49 @@
-import { useState } from "react";
-import { FileText, HeartPulse, Clock3, Stethoscope, PencilLine } from "lucide-react";
+import { useState, useEffect } from "react";
+import { FileText, HeartPulse, Clock3, Stethoscope, PencilLine, Eye, X, Save } from "lucide-react";
 import { DashboardLayout } from "../../components/DashboardLayout";
 
-const initialRecords = [
-  {
-    id: "AS-1042",
-    initials: "AS",
-    name: "Aarav Sharma",
-    details: "34 years · Male · OPD-1042",
-    status: "Pre-consultation complete",
-    summary:
-      "Persistent headache for three days, with intermittent light sensitivity. No emergency warning signs reported. Patient completed the pre-consultation questionnaire and is awaiting physician review.",
-    notes: "No emergency warning signs reported. Patient has completed the pre-consultation questionnaire.",
-    documents: [
-      { time: "09:10 AM", title: "Pre-consultation form", description: "Symptoms and general history submitted" },
-      { time: "09:14 AM", title: "Vitals record", description: "Blood pressure, pulse, and temperature recorded" },
-      { time: "09:18 AM", title: "Uploaded document", description: "Previous clinic note attached" },
-    ],
-  },
-  {
-    id: "MP-1043",
-    initials: "MP",
-    name: "Meera Patel",
-    details: "48 years · Female · OPD-1043",
-    status: "Pre-consultation complete",
-    summary:
-      "Follow-up for fatigue and a recent change in sleep pattern. Symptoms are mild and stable. Patient provided a short symptom summary before arrival and requested a routine consultation.",
-    notes: "Patient requested a routine consultation and uploaded a short symptom summary before arrival.",
-    documents: [
-      { time: "09:25 AM", title: "Pre-consultation form", description: "Lifestyle and symptom questionnaire completed" },
-      { time: "09:29 AM", title: "Vitals record", description: "Initial observations recorded at reception" },
-      { time: "09:34 AM", title: "Medical document", description: "Prior test summary attached" },
-    ],
-  },
-  {
-    id: "RK-1044",
-    initials: "RK",
-    name: "Rohan Kumar",
-    details: "29 years · Male · OPD-1044",
-    status: "Pre-consultation complete",
-    summary:
-      "Seasonal cough and throat discomfort since the weekend. No acute respiratory distress noted. Patient has shared earlier prescription details for review during the consultation.",
-    notes: "Pre-consultation notes indicate no known urgent concerns. Awaiting physician review.",
-    documents: [
-      { time: "09:40 AM", title: "Pre-consultation form", description: "Presenting concern and duration recorded" },
-      { time: "09:44 AM", title: "Vitals record", description: "Baseline measurements added" },
-      { time: "09:48 AM", title: "Uploaded document", description: "Photo of an earlier prescription attached" },
-    ],
-  },
-];
-
 export function DoctorPatientRecords() {
-  const [records, setRecords] = useState(initialRecords);
+  const [records, setRecords] = useState([]);
+  const [previewRecord, setPreviewRecord] = useState(null);
+  const [previewSummary, setPreviewSummary] = useState("");
+
+  useEffect(() => {
+    try {
+      const storedHistory = localStorage.getItem("medikiosk_case_history");
+      if (storedHistory) {
+        const parsedHistory = JSON.parse(storedHistory);
+        const historyArray = Array.isArray(parsedHistory) ? parsedHistory : [parsedHistory];
+        
+        const dynamicRecords = historyArray.map((caseItem) => ({
+          id: caseItem.id || `CAS-${Math.floor(Math.random() * 10000)}`,
+          initials: "PT",
+          name: `Patient (${caseItem.id || "Unknown"})`,
+          details: `Recorded: ${caseItem.displayDate || caseItem.dateFormatted || "N/A"}`,
+          status: caseItem.status || "Completed",
+          summary: caseItem.summary || caseItem.markdown || "No summary available.",
+          notes: `Chief Complaint: ${caseItem.chiefComplaint || "None reported"}`,
+          documents: caseItem.reportSummaries && caseItem.reportSummaries.length > 0
+            ? caseItem.reportSummaries.map((doc, idx) => ({
+                time: caseItem.displayDate?.split(',')[1]?.trim() || "00:00",
+                title: doc.fileName || `Uploaded Document ${idx + 1}`,
+                description: doc.mimeType === "application/pdf" ? "PDF Document" : "Medical File"
+              }))
+            : [
+                {
+                  time: caseItem.displayDate?.split(',')[1]?.trim() || "00:00",
+                  title: "Pre-consultation form",
+                  description: "Symptoms and general history submitted"
+                }
+              ]
+        }));
+        
+        // Show newest records first
+        setRecords(dynamicRecords.reverse());
+      }
+    } catch (error) {
+      console.error("Error parsing medikiosk_case_history:", error);
+    }
+  }, []);
 
   const handleSummaryChange = (recordId, value) => {
     setRecords((currentRecords) =>
@@ -59,6 +51,18 @@ export function DoctorPatientRecords() {
         record.id === recordId ? { ...record, summary: value } : record,
       ),
     );
+  };
+
+  const openPreview = (record) => {
+    setPreviewRecord(record);
+    setPreviewSummary(record.summary);
+  };
+
+  const handleSavePreview = () => {
+    if (previewRecord) {
+      handleSummaryChange(previewRecord.id, previewSummary);
+      setPreviewRecord(null);
+    }
   };
 
   return (
@@ -102,10 +106,20 @@ export function DoctorPatientRecords() {
                       <Stethoscope className="size-3.5" />
                       Editable summary
                     </div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[0.65rem] font-medium text-[#0c5e5b] ring-1 ring-teal-100">
-                      <PencilLine className="size-3" />
-                      Draft
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openPreview(record)}
+                        className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2 py-1 text-[0.65rem] font-medium text-[#0c5e5b] transition hover:bg-teal-100 cursor-pointer"
+                        title="Preview & Edit"
+                      >
+                        <Eye className="size-3" />
+                        Preview
+                      </button>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[0.65rem] font-medium text-[#0c5e5b] ring-1 ring-teal-100">
+                        <PencilLine className="size-3" />
+                        Draft
+                      </span>
+                    </div>
                   </div>
 
                   <textarea
@@ -156,6 +170,45 @@ export function DoctorPatientRecords() {
           ))}
         </div>
       </div>
+
+      {previewRecord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 p-5">
+              <h2 className="text-lg font-bold text-gray-900">Preview & Edit Summary - {previewRecord.name}</h2>
+              <button 
+                onClick={() => setPreviewRecord(null)} 
+                className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <textarea
+                value={previewSummary}
+                onChange={(e) => setPreviewSummary(e.target.value)}
+                rows={15}
+                className="w-full resize-none rounded-xl border border-gray-200 bg-[#f9fbfa] px-4 py-3 text-sm leading-6 text-gray-800 shadow-sm outline-none transition focus:border-[#0c5e5b] focus:ring-2 focus:ring-[#d9efeb]"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 rounded-b-2xl border-t border-gray-100 bg-gray-50 p-5">
+              <button 
+                onClick={() => setPreviewRecord(null)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSavePreview}
+                className="flex items-center gap-2 rounded-lg bg-[#0c5e5b] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#094845] cursor-pointer"
+              >
+                <Save className="size-4" />
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
