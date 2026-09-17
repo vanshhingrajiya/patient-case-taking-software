@@ -26,7 +26,7 @@ export function DoctorPatientRecords() {
           documents: caseItem.reportSummaries && caseItem.reportSummaries.length > 0
             ? caseItem.reportSummaries.map((doc, idx) => ({
                 id: doc.id || `doc-${idx}`,
-                time: caseItem.displayDate?.split(',')[1]?.trim() || "00:00",
+                time: caseItem.displayDate || caseItem.dateFormatted || "00:00",
                 title: doc.fileName || `Uploaded Document ${idx + 1}`,
                 description: doc.mimeType === "application/pdf" ? "PDF Document" : "Medical File",
                 fileUrl: doc.fileUrl || doc.url,
@@ -37,7 +37,7 @@ export function DoctorPatientRecords() {
             : [
                 {
                   id: 'default-doc',
-                  time: caseItem.displayDate?.split(',')[1]?.trim() || "00:00",
+                  time: caseItem.displayDate || caseItem.dateFormatted || "00:00",
                   title: "Pre-consultation form",
                   description: "Symptoms and general history submitted",
                   status: "Completed",
@@ -177,35 +177,37 @@ export function DoctorPatientRecords() {
                       {record.documents.map((document, idx) => (
                         <div key={`${record.id}-${document.time}-${document.title}`} className="relative flex gap-4">
                           <span
-                            className={`relative z-10 mt-1.5 flex size-4 shrink-0 rounded-full border-2 border-white shadow-sm ${
+                            className={`relative z-10 mt-0.5 flex size-4 shrink-0 rounded-full border-2 border-white shadow-sm ${
                               idx === 0 ? "bg-[#0c5e5b] shadow-[0_0_0_4px_rgba(12,94,91,0.12)]" : "bg-[#51a9a1]"
                             }`}
                           />
 
-                          <div className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-[#f9fbfa] p-3">
-                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                              <div className="flex items-center gap-2">
-                                <button 
-                                  onClick={() => setSelectedDocument({ recordId: record.id, doc: document })}
-                                  className="text-xs font-semibold text-gray-800 hover:text-[#0c5e5b] transition text-left cursor-pointer"
-                                >
-                                  {document.title}
-                                </button>
-                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-medium capitalize ${
-                                  document.status === "critical" ? "bg-red-100 text-red-700" :
-                                  document.status === "abnormal" ? "bg-amber-100 text-amber-800" :
-                                  document.status === "normal" ? "bg-emerald-100 text-emerald-700" :
-                                  "bg-teal-50 text-[#0c5e5b]"
-                                }`}>
-                                  {document.status}
-                                </span>
+                          <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+                            <span className="inline-flex items-center gap-1.5 text-[0.68rem] font-medium text-gray-500">
+                              <Clock3 className="size-3 text-gray-400" />
+                              {document.time}
+                            </span>
+                            <div className="rounded-xl border border-gray-200 bg-[#f9fbfa] p-3">
+                              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex items-center gap-2">
+                                  <button 
+                                    onClick={() => setSelectedDocument({ recordId: record.id, doc: document })}
+                                    className="text-xs font-semibold text-gray-800 hover:text-[#0c5e5b] transition text-left cursor-pointer"
+                                  >
+                                    {document.title}
+                                  </button>
+                                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-medium capitalize ${
+                                    document.status === "critical" ? "bg-red-100 text-red-700" :
+                                    document.status === "abnormal" ? "bg-amber-100 text-amber-800" :
+                                    document.status === "normal" ? "bg-emerald-100 text-emerald-700" :
+                                    "bg-teal-50 text-[#0c5e5b]"
+                                  }`}>
+                                    {document.status}
+                                  </span>
+                                </div>
                               </div>
-                              <span className="inline-flex items-center gap-1 text-[0.68rem] text-gray-400">
-                                <Clock3 className="size-3" />
-                                {document.time}
-                              </span>
+                              <p className="mt-2 text-xs text-gray-500">{document.description}</p>
                             </div>
-                            <p className="mt-1 text-xs text-gray-500">{document.description}</p>
                           </div>
                         </div>
                       ))}
