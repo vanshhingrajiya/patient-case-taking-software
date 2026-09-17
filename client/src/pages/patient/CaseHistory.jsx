@@ -601,7 +601,16 @@ export function CaseHistory() {
                       {selectedCase.reportSummaries.map((report) => (
                         <article key={report.id} className="rounded-xl border border-gray-200 bg-white p-3.5">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <p className="flex items-center gap-2 text-xs font-bold text-gray-900"><FileText className="size-4 text-[#0c5e5b]" />{report.fileName}</p>
+                            <p className="flex items-center gap-2 text-xs font-bold text-gray-900">
+                              <FileText className="size-4 text-[#0c5e5b]" />
+                              {report.fileUrl ? (
+                                <a href={report.fileUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#0c5e5b] hover:underline cursor-pointer">
+                                  {report.fileName}
+                                </a>
+                              ) : (
+                                report.fileName
+                              )}
+                            </p>
                             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold capitalize ${report.analysis?.overall_status === "critical" ? "bg-red-100 text-red-700" : report.analysis?.overall_status === "abnormal" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-700"}`}>{report.analysis?.overall_status || "review"}</span>
                           </div>
                           <p className="mt-2 text-sm leading-relaxed text-gray-800">{report.analysis?.clinical_summary || "Report summary unavailable."}</p>

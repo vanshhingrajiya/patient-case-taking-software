@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { requireAuth } from "../middleware/auth.middleware.js";
-import { extractTextFromDocument, summarizeCaseReport } from "../controllers/ocr.controller.js";
+import { extractTextFromDocument, summarizeCaseReport, uploadAndSummarizeCaseReport } from "../controllers/ocr.controller.js";
 
 const router = express.Router();
 const allowedMimeTypes = new Set(["application/pdf", "image/jpeg", "image/jpg", "image/png"]);
@@ -18,5 +18,6 @@ const upload = multer({
 
 router.post("/ocr-doc", upload.single("file"), extractTextFromDocument);
 router.post("/case-report-summary", requireAuth, upload.single("file"), summarizeCaseReport);
+router.post("/case-report-upload", requireAuth, upload.single("file"), uploadAndSummarizeCaseReport);
 
 export default router;

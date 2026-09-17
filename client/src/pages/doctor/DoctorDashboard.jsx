@@ -93,13 +93,13 @@ export function DoctorDashboard() {
     {
       label: "Numbers of patients",
       value: animatedPatientCount,
-      detail: "Updated dynamically",
+      detail: "Total registered patients",
       icon: Users,
     },
     {
       label: "Number of cases",
       value: animatedCasesCount,
-      detail: "From local storage",
+      detail: "Total recorded cases",
       icon: FileText,
     },
     {
