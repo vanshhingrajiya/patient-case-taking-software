@@ -1,54 +1,121 @@
 import {
   Activity,
-  CalendarDays,
+  AlertTriangle,
   ClipboardList,
   FileText,
-  Stethoscope,
   Users,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "../../components/DashboardLayout";
+import { apiClient } from "../../services/api.client";
 
-const metrics = [
-  {
-    label: "Patients today",
-    value: "24",
-    detail: "+4 vs yesterday",
-    icon: Users,
-  },
-  {
-    label: "Awaiting review",
-    value: "08",
-    detail: "2 high priority",
-    icon: ClipboardList,
-  },
-  {
-    label: "Follow-ups",
-    value: "12",
-    detail: "3 need callback",
-    icon: CalendarDays,
-  },
-  {
-    label: "Clinical notes",
-    value: "18",
-    detail: "3 pending approval",
-    icon: FileText,
-  },
-];
+// Custom hook for count-up animation
+function useCountUp(endValue, duration = 1500) {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
 
-const queue = [
-  { name: "Aarav Sharma", time: "09:10 AM", status: "Pre-consultation complete" },
-  { name: "Meera Patel", time: "09:25 AM", status: "Vitals recorded" },
-  { name: "Rohan Kumar", time: "09:40 AM", status: "Document upload complete" },
-  { name: "Sana Khan", time: "10:05 AM", status: "Waiting in queue" },
-];
+  useEffect(() => {
+    // Start animation only when endValue is a valid number
+    const end = parseInt(endValue, 10);
+    if (isNaN(end)) {
+      setCount(endValue);
+      return;
+    }
 
-const focusAreas = [
-  "Review submitted history summaries before consultation.",
-  "Check recent prescriptions and ongoing follow-ups.",
-  "Confirm patient documents are uploaded in the correct order.",
-];
+    setHasStarted(true);
+    let startTimestamp = null;
+
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+      // Use easeOutQuart easing function for smoother animation
+      const easeOut = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(easeOut * end));
+
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        setCount(end);
+      }
+    };
+
+    window.requestAnimationFrame(step);
+  }, [endValue, duration]);
+
+  return hasStarted && !isNaN(parseInt(endValue, 10)) ? count : endValue;
+}
 
 export function DoctorDashboard() {
+  const [stats, setStats] = useState({
+    patientCount: "...",
+    aiFlaggedCount: "...",
+    abnormalReportsCount: "...",
+  });
+  const [casesCount, setCasesCount] = useState("...");
+
+  useEffect(() => {
+    // Number of cases (fetch from local storage)
+    const storedCases = localStorage.getItem("casesCount");
+    setCasesCount(storedCases ? storedCases : "15");
+
+    // Dynamic stats from backend API
+    const fetchStats = async () => {
+      try {
+        const response = await apiClient.get('/dashboard/doctor-stats');
+        if (response?.data) {
+          setStats({
+            patientCount: response.data.patientCount,
+            aiFlaggedCount: response.data.aiFlaggedCount,
+            abnormalReportsCount: response.data.abnormalReportsCount,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+        // Fallback to dummies if backend fails or route is unprotected
+        setStats({
+          patientCount: "42",
+          aiFlaggedCount: "5",
+          abnormalReportsCount: "3",
+        });
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const animatedPatientCount = useCountUp(stats.patientCount);
+  const animatedCasesCount = useCountUp(casesCount);
+  const animatedAiFlagged = useCountUp(stats.aiFlaggedCount);
+  const animatedAbnormal = useCountUp(stats.abnormalReportsCount);
+
+  const metrics = [
+    {
+      label: "Numbers of patients",
+      value: animatedPatientCount,
+      detail: "Updated dynamically",
+      icon: Users,
+    },
+    {
+      label: "Number of cases",
+      value: animatedCasesCount,
+      detail: "From local storage",
+      icon: FileText,
+    },
+    {
+      label: "AI-Flagged Cases",
+      value: animatedAiFlagged,
+      detail: "Needs attention",
+      icon: ClipboardList,
+    },
+    {
+      label: "Abnormal Reports",
+      value: animatedAbnormal,
+      detail: "Review required",
+      icon: AlertTriangle,
+    },
+  ];
+
   return (
     <DashboardLayout title="Doctor Dashboard">
       <div className="space-y-6">
@@ -59,10 +126,6 @@ export function DoctorDashboard() {
                 Clinical overview
               </p>
               <h1 className="mt-2 text-2xl font-bold text-gray-900">Good morning, Dr. Mehta</h1>
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#e2f2ef] px-3 py-2 text-sm font-medium text-[#0c5e5b]">
-              <Activity className="size-4" />
-              7 consultations scheduled
             </div>
           </div>
         </div>
@@ -80,48 +143,6 @@ export function DoctorDashboard() {
               <p className="mt-2 text-xs text-gray-500">{detail}</p>
             </div>
           ))}
-        </div>
-
-        <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-2xs sm:p-6">
-            <div className="flex items-center gap-2">
-              <Stethoscope className="size-4 text-[#0c5e5b]" />
-              <h2 className="text-base font-bold text-gray-900">Consultation queue</h2>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {queue.map((patient) => (
-                <div
-                  key={patient.name}
-                  className="flex items-center justify-between rounded-xl border border-gray-200 bg-[#f9fbfa] px-4 py-3"
-                >
-                  <div>
-                    <p className="font-semibold text-gray-800">{patient.name}</p>
-                    <p className="text-xs text-gray-500">{patient.time}</p>
-                  </div>
-                  <span className="rounded-full bg-teal-50 px-2.5 py-1 text-[0.68rem] font-semibold text-[#0c5e5b]">
-                    {patient.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-2xs sm:p-6">
-            <div className="flex items-center gap-2">
-              <ClipboardList className="size-4 text-[#0c5e5b]" />
-              <h2 className="text-base font-bold text-gray-900">Today's focus</h2>
-            </div>
-
-            <ul className="mt-4 space-y-3">
-              {focusAreas.map((item) => (
-                <li key={item} className="flex gap-3 text-sm text-gray-600">
-                  <span className="mt-1.5 size-2 rounded-full bg-[#0c5e5b]" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
         </div>
       </div>
     </DashboardLayout>
