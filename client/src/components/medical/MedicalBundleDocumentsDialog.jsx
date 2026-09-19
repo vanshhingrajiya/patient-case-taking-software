@@ -45,7 +45,7 @@ export function MedicalBundleDocumentsDialog({ bundle, onClose, onDelete, onDocu
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#143337]/35 p-4 sm:p-8 backdrop-blur-sm" onClick={onClose}>
       <div 
-        className={`relative flex w-full max-h-[min(88vh,760px)] ${dialogMaxWidth} flex-col rounded-3xl border border-[#d1e2dc] bg-white p-6 shadow-[0_20px_60px_rgba(12,94,91,.2)] sm:p-8 transition-all duration-300`} 
+        className={`relative flex w-full min-w-0 min-h-0 max-h-[min(88vh,760px)] ${dialogMaxWidth} flex-col overflow-hidden rounded-3xl border border-[#d1e2dc] bg-white p-6 shadow-[0_20px_60px_rgba(12,94,91,.2)] sm:p-8 transition-all duration-300`}
         onClick={(e) => e.stopPropagation()}
       >
         {activeView.type === "list" && (
