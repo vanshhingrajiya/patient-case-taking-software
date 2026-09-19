@@ -31,7 +31,7 @@ export const medicalHistoryService = {
     request(`/medical-history/bundle/${bundleId}`, { method: "DELETE" }),
 
   summarizeCaseReport: (formData) =>
-    request("/util/case-report-summary", {
+    request("/util/case-report-upload", {
       method: "POST",
       body: formData,
     }),

@@ -2,6 +2,12 @@ import { MedicalDocument } from "../models/index.js";
 import { performSarvamOCR } from "../utils/ocr.utils.js";
 import { extractMedicalDataFromOCR } from "../utils/llm.utils.js";
 
+const UUID_PATTERN = /\b(?:upload-)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\b/gi;
+
+function normalizeRawText(rawText) {
+  return rawText.replace(UUID_PATTERN, "").trim();
+}
+
 /**
  * Background job to process a medical document (OCR -> LLM Summary -> DB Update)
  * @param {string} documentId - The MongoDB ObjectID of the MedicalDocument
@@ -25,6 +31,8 @@ export async function processMedicalDocumentBackground(documentId, fileBuffer, m
       rawText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
     }
 
+    rawText = rawText ? normalizeRawText(rawText) : rawText;
+
     if (!rawText) {
       console.warn(`[Background Job] No text extracted by OCR for document ${documentId}.`);
       await MedicalDocument.findByIdAndUpdate(documentId, { 
@@ -46,6 +54,13 @@ export async function processMedicalDocumentBackground(documentId, fileBuffer, m
       });
       return;
     }
+
+    if (!extractedData || typeof extractedData !== "object" || Array.isArray(extractedData)) {
+      extractedData = {};
+    }
+
+    extractedData.rawText = rawText;
+    delete extractedData.summary;
 
     // 3. Update Document with Success
     await MedicalDocument.findByIdAndUpdate(documentId, {

@@ -13,6 +13,73 @@ import { getNavigationForRole } from "../constants/navigation";
 import { ROLE_LABELS } from "../constants/roles";
 import { LanguageSelector } from "./LanguageSelector";
 import { TranslatedText } from "./common/TranslatedText";
+import { createPortal } from "react-dom";
+
+const LocalStorageDebugger = () => {
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState("");
+
+  const handleOpen = () => {
+    try {
+      const raw = localStorage.getItem("medikiosk_case_history") || "[]";
+      // Format it nicely for editing
+      const parsed = JSON.parse(raw);
+      setData(JSON.stringify(parsed, null, 2));
+    } catch (e) {
+      setData(localStorage.getItem("medikiosk_case_history") || "[]");
+    }
+    setOpen(true);
+  };
+
+  const handleSave = () => {
+    try {
+      JSON.parse(data); // Validate JSON
+      localStorage.setItem("medikiosk_case_history", data);
+      alert("Saved successfully! Refresh page to see changes.");
+      setOpen(false);
+      window.location.reload();
+    } catch (e) {
+      alert("Invalid JSON format. Please fix syntax errors before saving.");
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={handleOpen}
+        className="rounded-lg bg-orange-100 px-3 py-1.5 text-[0.65rem] font-bold text-orange-700 hover:bg-orange-200 shadow-xs cursor-pointer"
+        title="Debug LocalStorage"
+      >
+        DEV: Edit Storage
+      </button>
+
+      {open && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 sm:p-6" onClick={() => setOpen(false)}>
+          <div className="flex w-full max-w-4xl flex-col rounded-2xl bg-white p-4 sm:p-5 shadow-xl max-h-full h-[85vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3 shrink-0">
+              <h2 className="text-lg font-bold text-gray-900">Edit medikiosk_case_history</h2>
+              <button onClick={() => setOpen(false)} className="rounded-full p-1 text-gray-400 hover:bg-gray-100 cursor-pointer">
+                <X className="size-5" />
+              </button>
+            </div>
+            <textarea
+              className="flex-1 w-full resize-none rounded-xl border border-gray-300 bg-[#f9fbfa] p-4 font-mono text-[0.7rem] outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 shadow-inner"
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              spellCheck="false"
+            />
+            <div className="mt-5 flex justify-end gap-3 pt-2 shrink-0">
+              <button onClick={() => setOpen(false)} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 cursor-pointer">Cancel</button>
+              <button onClick={handleSave} className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 cursor-pointer shadow-sm">Save Changes & Reload</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
+};
 
 /**
  * Reusable, responsive dashboard navigation layout.
@@ -174,22 +241,20 @@ export function DashboardLayout({
             const Icon = item.icon;
             const active = isItemActive(item.path);
 
-            const commonClasses = `group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#0c5e5b] cursor-pointer ${
-              active
+            const commonClasses = `group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#0c5e5b] cursor-pointer ${active
                 ? "bg-[#e2f2ef] text-[#0c5e5b] font-semibold shadow-2xs"
                 : "text-gray-600 hover:bg-[#f4f9f7] hover:text-gray-900"
-            }`;
+              }`;
 
             const itemContent = (
               <>
                 <div className="flex items-center gap-3 min-w-0">
                   {Icon && (
                     <Icon
-                      className={`size-5 shrink-0 transition-colors ${
-                        active
+                      className={`size-5 shrink-0 transition-colors ${active
                           ? "text-[#0c5e5b]"
                           : "text-gray-400 group-hover:text-gray-600"
-                      }`}
+                        }`}
                       aria-hidden="true"
                     />
                   )}
@@ -199,11 +264,10 @@ export function DashboardLayout({
                 </div>
                 {item.badge && (
                   <span
-                    className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      active
+                    className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${active
                         ? "bg-[#0c5e5b] text-white"
                         : "bg-gray-100 text-gray-600"
-                    }`}
+                      }`}
                   >
                     {item.badge}
                   </span>
@@ -294,9 +358,8 @@ export function DashboardLayout({
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation drawer"
@@ -309,7 +372,7 @@ export function DashboardLayout({
          ======================================================== */}
       <div className="flex min-h-screen flex-col lg:pl-64">
         {/* Sticky Top Bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-gray-200 bg-white/95 px-4 backdrop-blur-md sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/95 px-4 backdrop-blur-md sm:px-6 lg:px-8">
           {/* Left section: mobile hamburger & MediKiosk branding */}
           <div className="flex items-center gap-3">
             {/* Mobile menu button */}
@@ -346,6 +409,8 @@ export function DashboardLayout({
 
           {/* Right section: Language selector, User / Account section & Logout icon button */}
           <div className="flex items-center gap-2.5 sm:gap-4">
+            <LocalStorageDebugger />
+
             {/* Language Selector next to profile */}
             <LanguageSelector />
 

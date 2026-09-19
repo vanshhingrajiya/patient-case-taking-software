@@ -1,5 +1,6 @@
 import { performSarvamOCR } from "../utils/ocr.utils.js";
 import { summarizeReportForCase } from "../utils/llm.utils.js";
+import { uploadMedicalDocument } from "../services/cloudinary.service.js";
 
 export const extractTextFromDocument = async (req, res) => {
   try {
@@ -53,6 +54,53 @@ export const summarizeCaseReport = async (req, res) => {
     });
   } catch (error) {
     console.error("Case report summary error:", error);
+    return res.status(502).json({ message: "Unable to analyze this report right now." });
+  }
+};
+
+export const uploadAndSummarizeCaseReport = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Upload a medical report to continue." });
+    }
+
+    const caseSummary = typeof req.body.caseSummary === "string" ? req.body.caseSummary.trim() : "";
+    if (!caseSummary) {
+      return res.status(400).json({ message: "A case summary is required." });
+    }
+
+    // Upload to cloudinary
+    let fileUrl = null;
+    try {
+      const uploadResult = await uploadMedicalDocument(req.file.buffer, {
+        folder: "case_reports",
+        mimeType: req.file.mimetype,
+        originalFileName: req.file.originalname,
+      });
+      fileUrl = uploadResult.secure_url;
+    } catch (uploadError) {
+      console.error("Cloudinary upload failed:", uploadError);
+      return res.status(502).json({ message: "Unable to upload the report to cloud storage." });
+    }
+
+    const ocrResult = await performSarvamOCR(req.file.buffer, req.file.mimetype);
+    const ocrText = typeof ocrResult === "string" ? ocrResult : JSON.stringify(ocrResult, null, 2);
+    if (!ocrText.trim()) {
+      return res.status(422).json({ message: "No readable text was found in this report." });
+    }
+
+    const analysis = await summarizeReportForCase(caseSummary, ocrText);
+    return res.status(200).json({
+      message: "Report analyzed and uploaded successfully.",
+      report: {
+        fileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        fileUrl,
+        analysis,
+      },
+    });
+  } catch (error) {
+    console.error("Case report upload and summary error:", error);
     return res.status(502).json({ message: "Unable to analyze this report right now." });
   }
 };
