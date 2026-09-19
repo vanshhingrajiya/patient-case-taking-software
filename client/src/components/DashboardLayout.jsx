@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 import { getNavigationForRole } from "../constants/navigation";
 import { ROLE_LABELS } from "../constants/roles";
 import { LanguageSelector } from "./LanguageSelector";
+import { TranslatedText } from "./common/TranslatedText";
 
 /**
  * Reusable, responsive dashboard navigation layout.
@@ -192,7 +193,9 @@ export function DashboardLayout({
                       aria-hidden="true"
                     />
                   )}
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate">
+                    <TranslatedText text={item.label} />
+                  </span>
                 </div>
                 {item.badge && (
                   <span
@@ -334,7 +337,7 @@ export function DashboardLayout({
                 <>
                   <span className="text-gray-300 font-light">/</span>
                   <span className="text-sm font-semibold text-gray-700 hidden sm:inline-block">
-                    {title}
+                    <TranslatedText text={title} />
                   </span>
                 </>
               )}

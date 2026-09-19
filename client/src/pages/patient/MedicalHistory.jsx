@@ -16,6 +16,7 @@ import { deleteMedicalBundle, deleteMedicalDocument, getMedicalHistory } from ".
 import { MedicalBundleEditDialog } from "../../components/medical/MedicalBundleEditDialog";
 import { MedicalDocumentAddDialog } from "../../components/medical/MedicalDocumentAddDialog";
 import { MedicalBundleDocumentsDialog } from "../../components/medical/MedicalBundleDocumentsDialog";
+import { TranslatedText } from "../../components/common/TranslatedText";
 
 export function MedicalHistory() {
   const navigate = useNavigate();
@@ -113,10 +114,10 @@ export function MedicalHistory() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Comprehensive Medical History
+                  <TranslatedText text="Comprehensive Medical History" />
                 </h1>
                 <p className="mt-1 text-xs text-gray-500">
-                  All clinical diagnoses, active prescriptions, and critical drug allergies recorded in your profile.
+                  <TranslatedText text="All clinical diagnoses, active prescriptions, and critical drug allergies recorded in your profile." />
                 </p>
               </div>
             </div>
@@ -127,7 +128,7 @@ export function MedicalHistory() {
               className="inline-flex items-center gap-2 rounded-xl bg-[#0c5e5b] px-4 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-[#084341] cursor-pointer"
             >
               <PlusCircle className="size-4" />
-              Record New Symptom
+              <TranslatedText text="Record New Symptom" />
             </button>
           </div>
         </div>
@@ -139,26 +140,26 @@ export function MedicalHistory() {
                 <FileText className="size-4.5" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-gray-900">Uploaded Medical Documents</h2>
-                <span className="text-xs text-gray-500">Records grouped by medical event</span>
+                <h2 className="text-base font-bold text-gray-900"><TranslatedText text="Uploaded Medical Documents" /></h2>
+                <span className="text-xs text-gray-500"><TranslatedText text="Records grouped by medical event" /></span>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {!bundlesLoading && <span className="rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-semibold text-[#0c5e5b]">{bundles.length} {bundles.length === 1 ? "Bundle" : "Bundles"}</span>}
+              {!bundlesLoading && <span className="rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-semibold text-[#0c5e5b]">{bundles.length} {bundles.length === 1 ? <TranslatedText text="Bundle" /> : <TranslatedText text="Bundles" />}</span>}
               <button
                 type="button"
                 onClick={() => setUploadOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-[#0c5e5b] px-3 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#084341] cursor-pointer"
               >
                 <RiAddLine className="size-4" />
-                Add Medical Docs
+                <TranslatedText text="Add Medical Docs" />
               </button>
             </div>
           </div>
 
-          {bundlesLoading && <p className="mt-4 text-sm text-gray-500">Loading medical documents...</p>}
+          {bundlesLoading && <p className="mt-4 text-sm text-gray-500"><TranslatedText text="Loading medical documents..." /></p>}
           {!bundlesLoading && bundlesError && <p className="mt-4 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">{bundlesError}</p>}
-          {!bundlesLoading && !bundlesError && bundles.length === 0 && <p className="mt-4 text-sm text-gray-500">No uploaded medical documents yet.</p>}
+          {!bundlesLoading && !bundlesError && bundles.length === 0 && <p className="mt-4 text-sm text-gray-500"><TranslatedText text="No uploaded medical documents yet." /></p>}
           {!bundlesLoading && !bundlesError && bundles.length > 0 && <div className="mt-4 grid items-start gap-4 md:grid-cols-2">{bundles.map((bundle) => <MedicalHistoryBundleCard key={bundle._id} bundle={bundle} onDeleteBundle={removeBundle} onUpdate={setEditingBundle} onViewBundle={(selectedBundle) => setViewingBundleId(selectedBundle._id)} />)}</div>}
         </div>
 

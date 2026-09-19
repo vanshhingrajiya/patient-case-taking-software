@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { RiHeartPulseLine, RiShieldCheckLine } from "@remixicon/react";
 import { LanguageSelector } from "./LanguageSelector";
+import { TranslatedText } from "./common/TranslatedText";
 
 export function AppShell({ children, go }) {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export function AppShell({ children, go }) {
           <LanguageSelector />
           <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-[#5d7c80]">
             <RiShieldCheckLine className="size-4 text-[#0c5e5b]" />
-            <span>Private & secure</span>
+            <span><TranslatedText text="Private & secure" /></span>
           </div>
         </div>
       </header>

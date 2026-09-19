@@ -11,7 +11,9 @@ import {
   FileHeart,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage, SUPPORTED_LANGUAGES } from "../../context/LanguageContext";
 import { DashboardLayout } from "../../components/DashboardLayout";
+import { TranslatedText } from "../../components/common/TranslatedText";
 
 const languageNames = {
   hi: "Hindi",
@@ -75,7 +77,7 @@ export function PatientDashboard({ session: propSession }) {
             {/* Column 1: Patient Name */}
             <div>
               <span className="block text-[0.68rem] font-bold tracking-[0.14em] text-[#789d9e] uppercase">
-                PATIENT NAME
+                <TranslatedText text="PATIENT NAME" />
               </span>
               <strong className="mt-1 block text-base font-bold text-white truncate">
                 {fullName}
@@ -85,41 +87,41 @@ export function PatientDashboard({ session: propSession }) {
             {/* Column 2: Age */}
             <div>
               <span className="block text-[0.68rem] font-bold tracking-[0.14em] text-[#789d9e] uppercase">
-                AGE
+                <TranslatedText text="AGE" />
               </span>
               <strong className="mt-1 block text-base font-bold text-white">
-                {age}
+                <TranslatedText text={age} />
               </strong>
             </div>
 
             {/* Column 3: Gender */}
             <div>
               <span className="block text-[0.68rem] font-bold tracking-[0.14em] text-[#789d9e] uppercase">
-                GENDER
+                <TranslatedText text="GENDER" />
               </span>
               <strong className="mt-1 block text-base font-bold text-white">
-                {gender}
+                <TranslatedText text={gender} />
               </strong>
             </div>
 
             {/* Column 4: Language */}
             <div>
               <span className="block text-[0.68rem] font-bold tracking-[0.14em] text-[#789d9e] uppercase">
-                LANGUAGE
+                <TranslatedText text="LANGUAGE" />
               </span>
               <strong className="mt-1 block text-base font-bold text-white">
-                {language}
+                <TranslatedText text={language} />
               </strong>
             </div>
 
             {/* Column 5: ABHA Status */}
             <div>
               <span className="block text-[0.68rem] font-bold tracking-[0.14em] text-[#789d9e] uppercase">
-                ABHA STATUS
+                <TranslatedText text="ABHA STATUS" />
               </span>
               <span className="mt-1 inline-flex items-center gap-1 text-sm font-bold text-[#4fd1c5]">
                 <ShieldCheck className="size-4" />
-                {abhaStatus}
+                <TranslatedText text={abhaStatus} />
               </span>
             </div>
           </div>
@@ -137,19 +139,19 @@ export function PatientDashboard({ session: propSession }) {
 
               {/* Eyebrow */}
               <div className="mt-5 text-[0.72rem] font-bold tracking-[0.14em] text-[#0c5e5b] uppercase">
-                YOUR NEXT STEP
+                <TranslatedText text="YOUR NEXT STEP" />
               </div>
 
               {/* Title */}
               <h2 className="mt-2 text-2xl sm:text-3xl font-bold leading-tight tracking-tight text-[#143840]">
-                Start AI Health
+                <TranslatedText text="Start AI Health" />
                 <br />
-                Consultation
+                <TranslatedText text="Consultation" />
               </h2>
 
               {/* Subtext */}
               <p className="mt-3 max-w-md text-sm leading-relaxed text-[#5d7c80]">
-                Tell us about your symptoms using your voice or by touching the screen. Quick intake for faster clinical care.
+                <TranslatedText text="Tell us about your symptoms using your voice or by touching the screen. Quick intake for faster clinical care." />
               </p>
             </div>
 
@@ -160,11 +162,11 @@ export function PatientDashboard({ session: propSession }) {
                 className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#143840] px-5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-[#0c252b] cursor-pointer"
                 onClick={() => navigate("/patient/new-case")}
               >
-                <span>Start New Case</span>
+                <span><TranslatedText text="Start New Case" /></span>
                 <ArrowRight className="size-4" />
               </button>
               <span className="text-xs text-[#5d7c80]">
-                Voice or touch input available
+                <TranslatedText text="Voice or touch input available" />
               </span>
             </div>
           </div>
@@ -178,7 +180,7 @@ export function PatientDashboard({ session: propSession }) {
                     <User className="size-4.5" />
                   </div>
                   <h3 className="text-lg font-bold text-[#143840]">
-                    My Health Profile
+                    <TranslatedText text="My Health Profile" />
                   </h3>
                 </div>
                 <button
@@ -186,7 +188,7 @@ export function PatientDashboard({ session: propSession }) {
                   className="inline-flex items-center gap-1 text-xs font-bold text-[#0c5e5b] hover:underline cursor-pointer"
                   onClick={() => navigate("/patient/profile")}
                 >
-                  <span>Full Profile</span>
+                  <span><TranslatedText text="Full Profile" /></span>
                   <ArrowRight className="size-3.5" />
                 </button>
               </div>
@@ -195,52 +197,52 @@ export function PatientDashboard({ session: propSession }) {
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div className="rounded-xl bg-[#f8faf9] p-3.5 border border-gray-100">
                   <span className="block text-xs font-medium text-gray-500">
-                    Height
+                    <TranslatedText text="Height" />
                   </span>
                   <span className="mt-1 block text-sm font-bold text-[#143840]">
-                    {medicalProfile?.heightCm ? `${medicalProfile.heightCm} cm` : "Not added"}
+                    {medicalProfile?.heightCm ? `${medicalProfile.heightCm} cm` : <TranslatedText text="Not added" />}
                   </span>
                 </div>
 
                 <div className="rounded-xl bg-[#f8faf9] p-3.5 border border-gray-100">
                   <span className="block text-xs font-medium text-gray-500">
-                    Weight
+                    <TranslatedText text="Weight" />
                   </span>
                   <span className="mt-1 block text-sm font-bold text-[#143840]">
-                    {medicalProfile?.weightKg ? `${medicalProfile.weightKg} kg` : "Not added"}
+                    {medicalProfile?.weightKg ? `${medicalProfile.weightKg} kg` : <TranslatedText text="Not added" />}
                   </span>
                 </div>
 
                 <div className="rounded-xl bg-[#f8faf9] p-3.5 border border-gray-100">
                   <span className="block text-xs font-medium text-gray-500">
-                    Blood Group
+                    <TranslatedText text="Blood Group" />
                   </span>
                   <span className="mt-1 block text-sm font-bold text-[#143840]">
-                    {medicalProfile?.bloodGroup || "Not added"}
+                    {medicalProfile?.bloodGroup || <TranslatedText text="Not added" />}
                   </span>
                 </div>
 
                 <div className="rounded-xl bg-[#f8faf9] p-3.5 border border-gray-100">
                   <span className="block text-xs font-medium text-gray-500">
-                    Conditions
+                    <TranslatedText text="Conditions" />
                   </span>
                   <span className="mt-1 block text-sm font-bold text-[#143840] truncate">
                     {medicalProfile?.chronicConditions?.length
                       ? medicalProfile.chronicConditions.join(", ")
-                      : "None recorded"}
+                      : <TranslatedText text="None recorded" />}
                   </span>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-              <span>ABHA ID: {patient?.identity?.abhaId || patient?.abhaId || "Not Linked"}</span>
+              <span>ABHA ID: {patient?.identity?.abhaId || patient?.abhaId || <TranslatedText text="Not Linked" />}</span>
               <button
                 type="button"
                 onClick={() => navigate("/patient/medical-history")}
                 className="text-[#0c5e5b] font-semibold hover:underline"
               >
-                View Medical History &rarr;
+                <TranslatedText text="View Medical History" /> &rarr;
               </button>
             </div>
           </div>
@@ -254,7 +256,7 @@ export function PatientDashboard({ session: propSession }) {
                     <Stethoscope className="size-4.5" />
                   </div>
                   <h3 className="text-lg font-bold text-[#143840]">
-                    Previous Consultations
+                    <TranslatedText text="Previous Consultations" />
                   </h3>
                 </div>
                 <button
@@ -262,7 +264,7 @@ export function PatientDashboard({ session: propSession }) {
                   className="inline-flex items-center gap-1 text-xs font-bold text-[#0c5e5b] hover:underline cursor-pointer"
                   onClick={() => navigate("/patient/case-history")}
                 >
-                  <span>All Cases</span>
+                  <span><TranslatedText text="All Cases" /></span>
                   <ArrowRight className="size-3.5" />
                 </button>
               </div>
@@ -274,10 +276,10 @@ export function PatientDashboard({ session: propSession }) {
                   <Stethoscope className="size-6" />
                 </div>
                 <strong className="block text-sm font-semibold text-[#143840]">
-                  No Previous Consultations
+                  <TranslatedText text="No Previous Consultations" />
                 </strong>
                 <p className="mt-1 max-w-xs text-xs text-gray-500">
-                  Your completed consultation history, diagnoses, and digital prescriptions will be recorded here.
+                  <TranslatedText text="Your completed consultation history, diagnoses, and digital prescriptions will be recorded here." />
                 </p>
               </div>
             </div>
@@ -288,7 +290,7 @@ export function PatientDashboard({ session: propSession }) {
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-[#0c5e5b]/20 bg-[#e2f2ef]/50 py-2.5 text-xs font-semibold text-[#0c5e5b] hover:bg-[#e2f2ef] transition-colors cursor-pointer"
             >
               <PlusCircle className="size-4" />
-              Book or Start New Consultation
+              <TranslatedText text="Book or Start New Consultation" />
             </button>
           </div>
 
@@ -301,11 +303,11 @@ export function PatientDashboard({ session: propSession }) {
                     <Phone className="size-4.5" />
                   </div>
                   <h3 className="text-lg font-bold text-[#143840]">
-                    Emergency Contact
+                    <TranslatedText text="Emergency Contact" />
                   </h3>
                 </div>
                 <span className="rounded-full bg-red-50 px-2.5 py-0.5 text-[0.68rem] font-bold text-red-700 uppercase">
-                  24/7 Priority
+                  <TranslatedText text="24/7 Priority" />
                 </span>
               </div>
 
@@ -314,27 +316,27 @@ export function PatientDashboard({ session: propSession }) {
               <div className="py-5">
                 <div className="rounded-xl bg-[#fff8f8] border border-red-100 p-4">
                   <strong className="block text-sm font-bold text-gray-900">
-                    {emergencyContact?.name || "No Emergency Contact Added"}
+                    {emergencyContact?.name || <TranslatedText text="No Emergency Contact Added" />}
                   </strong>
                   <span className="mt-0.5 block text-xs text-gray-600">
-                    Relationship: {emergencyContact?.relationship || "Relative / Guardian"}
+                    <TranslatedText text="Relationship" />: {emergencyContact?.relationship || <TranslatedText text="Relative / Guardian" />}
                   </span>
                   <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-red-700">
                     <Phone className="size-3.5" />
-                    <span>{emergencyContact?.phone || "Phone number not registered"}</span>
+                    <span>{emergencyContact?.phone || <TranslatedText text="Phone number not registered" />}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
-              <span>Hospital Emergency: <strong className="text-gray-800">108 / 112</strong></span>
+              <span><TranslatedText text="Hospital Emergency" />: <strong className="text-gray-800">108 / 112</strong></span>
               <button
                 type="button"
                 onClick={() => navigate("/patient/profile")}
                 className="text-[#0c5e5b] font-semibold hover:underline"
               >
-                Update Contact
+                <TranslatedText text="Update Contact" />
               </button>
             </div>
           </div>
