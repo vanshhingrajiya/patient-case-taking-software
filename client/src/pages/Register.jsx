@@ -8,6 +8,7 @@ import {
 } from "@remixicon/react";
 
 import { AppShell } from "../components/AppShell";
+import { TranslatedText } from "../components/common/TranslatedText";
 import {
   registerPatient,
   registerPatientProfile,
@@ -237,7 +238,7 @@ function Field({
   return (
     <div className="mt-4" id={`field-container-${name}`}>
       <label className="block text-xs font-semibold text-[#143337] mb-1.5" htmlFor={name}>
-        {label}
+        <TranslatedText text={label} />
         {required && <span className="text-[#e06a3b]"> *</span>}
       </label>
 
@@ -256,7 +257,7 @@ function Field({
           onChange={updateField}
           {...props}
         >
-          <option value="">Select {label.toLowerCase()}</option>
+          <option value="">Select {label}</option>
           {options.map((option) => {
             const value = Array.isArray(option) ? option[0] : option;
             const text = Array.isArray(option) ? option[1] : option;
@@ -287,7 +288,7 @@ function Field({
 
       {error && (
         <p id={`${name}-error`} className="mt-1.5 text-xs font-medium text-red-600">
-          {error}
+          <TranslatedText text={error} />
         </p>
       )}
     </div>
@@ -298,8 +299,14 @@ function FormSection({ title, description, children }) {
   return (
     <section className="mt-6 rounded-[22px] border border-[#e8f1ed] bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
       <div className="flex items-baseline justify-between gap-4 border-b border-[#edf4f1] pb-3.5 max-sm:block">
-        <h2 className="text-base font-bold text-[#143337]">{title}</h2>
-        {description && <p className="text-xs text-[#5d7c80] max-sm:mt-1">{description}</p>}
+        <h2 className="text-base font-bold text-[#143337]">
+          <TranslatedText text={title} />
+        </h2>
+        {description && (
+          <p className="text-xs text-[#5d7c80] max-sm:mt-1">
+            <TranslatedText text={description} />
+          </p>
+        )}
       </div>
       <div>{children}</div>
     </section>
@@ -505,41 +512,43 @@ export function Register({ session: propSession, go, onAuthenticated }) {
             onClick={() => handleNavigate("/")}
           >
             <RiArrowLeftSLine className="size-4 transition-transform group-hover:-translate-x-0.5" />
-            <span>Back to welcome</span>
+            <span><TranslatedText text="Back to welcome" /></span>
           </button>
           <button
             type="button"
             className="text-xs font-semibold text-[#5d7c80] hover:text-[#0c5e5b] cursor-pointer"
             onClick={() => handleNavigate("/login")}
           >
-            Already have an account?{" "}
-            <span className="font-bold text-[#0c5e5b] underline">Sign in</span>
+            <TranslatedText text="Already have an account?" />{" "}
+            <span className="font-bold text-[#0c5e5b] underline">
+              <TranslatedText text="Sign in" />
+            </span>
           </button>
         </div>
 
         <div className="mt-5 mb-8">
           <div className="mb-3 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-[#0c5e5b] uppercase">
             <RiUserAddLine className="size-4" />
-            <span>PATIENT REGISTRATION</span>
+            <span><TranslatedText text="PATIENT REGISTRATION" /></span>
           </div>
           <h1 className="text-[clamp(2.4rem,4.5vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.03em] text-[#143337]">
-            Patient Registration
+            <TranslatedText text="Patient Registration" />
           </h1>
           <p className="mt-2 text-base text-[#5d7c80]">
-            Create your digital patient profile to begin using MediKiosk and access OPD services.
+            <TranslatedText text="Create your digital patient profile to begin using MediKiosk and access OPD services." />
           </p>
         </div>
 
         {/* Generic server/system error banner (only shown if there are NO specific field errors) */}
         {generalError && Object.keys(errors).length === 0 && (
           <div className="my-4 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-medium text-red-700">
-            {generalError}
+            <TranslatedText text={generalError} />
           </div>
         )}
 
         {otpMessage && (
           <div className="my-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-xs font-medium text-emerald-800">
-            {otpMessage}
+            <TranslatedText text={otpMessage} />
           </div>
         )}
 
@@ -686,7 +695,6 @@ export function Register({ session: propSession, go, onAuthenticated }) {
           </div>
         </FormSection>
 
-
         {/* Account Verification (Visible only after OTP is sent) */}
         {otpRequested && (
           <FormSection
@@ -696,7 +704,7 @@ export function Register({ session: propSession, go, onAuthenticated }) {
             <div className="mt-4" id="field-container-otp">
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-semibold text-[#143337]" htmlFor="otp">
-                  Six-digit OTP <span className="text-[#e06a3b]">*</span>
+                  <TranslatedText text="Six-digit OTP" /> <span className="text-[#e06a3b]">*</span>
                 </label>
                 <button
                   type="button"
@@ -704,7 +712,11 @@ export function Register({ session: propSession, go, onAuthenticated }) {
                   className="text-xs font-bold text-[#0c5e5b] hover:underline cursor-pointer disabled:opacity-50"
                   onClick={handleResendOtp}
                 >
-                  {loadingAction === "resending_otp" ? "Resending..." : "Resend code"}
+                  {loadingAction === "resending_otp" ? (
+                    <TranslatedText text="Resending..." />
+                  ) : (
+                    <TranslatedText text="Resend code" />
+                  )}
                 </button>
               </div>
               <input
@@ -739,7 +751,7 @@ export function Register({ session: propSession, go, onAuthenticated }) {
               />
               {errors.otp && (
                 <p id="otp-error" className="mt-1.5 text-xs font-medium text-red-600">
-                  {errors.otp}
+                  <TranslatedText text={errors.otp} />
                 </p>
               )}
             </div>
@@ -776,14 +788,13 @@ export function Register({ session: propSession, go, onAuthenticated }) {
               }}
             />
             <span>
-              I agree to the use of my personal and health information for receiving MediKiosk
-              healthcare services under Ayushman Bharat Digital Mission (ABDM) guidelines.
+              <TranslatedText text="I agree to the use of my personal and health information for receiving MediKiosk healthcare services under Ayushman Bharat Digital Mission (ABDM) guidelines." />
               <span className="text-[#e06a3b]"> *</span>
             </span>
           </label>
           {errors.consent && (
             <p id="consent-error" className="mt-1.5 text-xs font-medium text-red-600">
-              {errors.consent}
+              <TranslatedText text={errors.consent} />
             </p>
           )}
         </div>
@@ -798,26 +809,26 @@ export function Register({ session: propSession, go, onAuthenticated }) {
             {loadingAction === "checking" ? (
               <>
                 <RiLoader4Line className="size-4 animate-spin" />
-                <span>Checking details...</span>
+                <span><TranslatedText text="Checking details..." /></span>
               </>
             ) : loadingAction === "sending_otp" ? (
               <>
                 <RiLoader4Line className="size-4 animate-spin" />
-                <span>Sending OTP...</span>
+                <span><TranslatedText text="Sending OTP..." /></span>
               </>
             ) : loadingAction === "registering" ? (
               <>
                 <RiLoader4Line className="size-4 animate-spin" />
-                <span>Completing Registration...</span>
+                <span><TranslatedText text="Completing Registration..." /></span>
               </>
             ) : otpRequested ? (
               <>
-                <span>Complete Registration</span>
+                <span><TranslatedText text="Complete Registration" /></span>
                 <RiArrowRightLine className="size-4" />
               </>
             ) : (
               <>
-                <span>Send OTP</span>
+                <span><TranslatedText text="Send OTP" /></span>
                 <RiArrowRightLine className="size-4" />
               </>
             )}

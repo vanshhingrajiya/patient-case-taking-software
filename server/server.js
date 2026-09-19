@@ -8,6 +8,7 @@ import medicalHistoryRoutes from "./src/routes/medical-history.routes.js";
 import medicalDocumentRoutes from "./src/routes/medical-document.routes.js";
 import utilRoutes from "./src/routes/util.routes.js";
 import dashboardRoutes from "./src/routes/dashboard.routes.js";
+import translateRoutes from "./src/routes/translate.routes.js";
 
 export function createApp() {
   const app = express();
@@ -25,6 +26,7 @@ export function createApp() {
   app.use("/api/medical-documents", medicalDocumentRoutes);
   app.use("/api/util", utilRoutes);
   app.use("/api/dashboard", dashboardRoutes);
+  app.use("/api/translate", translateRoutes);
 
   return app;
 }

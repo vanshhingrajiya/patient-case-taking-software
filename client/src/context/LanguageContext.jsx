@@ -1,25 +1,41 @@
-import { createContext, useContext, useEffect, useState, useCallback, useTransition } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { authService } from "../services/auth.service";
+import { translationService } from "../services/translation.service";
+import { setDomTranslatorLanguage } from "../services/domTranslator";
 import { useAuth } from "./AuthContext";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English", nativeName: "English", isDefault: true },
-  { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
+  { code: "as", name: "Assamese", nativeName: "অসমীয়া" },
+  { code: "bn", name: "Bengali", nativeName: "বাংলা" },
+  { code: "brx", name: "Bodo", nativeName: "बड़ो" },
+  { code: "doi", name: "Dogri", nativeName: "डोगरी" },
   { code: "gu", name: "Gujarati", nativeName: "ગુજરાતી" },
+  { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
   { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ" },
+  { code: "ks", name: "Kashmiri", nativeName: "कॉशुर" },
+  { code: "kok", name: "Konkani", nativeName: "कोंकणी" },
+  { code: "mai", name: "Maithili", nativeName: "मैथिली" },
   { code: "ml", name: "Malayalam", nativeName: "മലയാളം" },
+  { code: "mni", name: "Manipuri", nativeName: "মৈতৈলোন্" },
   { code: "mr", name: "Marathi", nativeName: "मराठी" },
+  { code: "ne", name: "Nepali", nativeName: "नेपाली" },
+  { code: "or", name: "Odia", nativeName: "ଓଡ଼ିଆ" },
+  { code: "pa", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ" },
+  { code: "sa", name: "Sanskrit", nativeName: "संस्कृतम्" },
+  { code: "sat", name: "Santali", nativeName: "ᱥᱟᱱᱛᱟᱲᱤ" },
+  { code: "sd", name: "Sindhi", nativeName: "سنڌي" },
   { code: "ta", name: "Tamil", nativeName: "தமிழ்" },
   { code: "te", name: "Telugu", nativeName: "తెలుగు" },
-  { code: "or", name: "Odia", nativeName: "ଓଡ଼ିଆ" },
-  { code: "as", name: "Assamese", nativeName: "অসমীয়া" },
-  { code: "pa", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ" },
+  { code: "ur", name: "Urdu", nativeName: "اردو" },
 ];
 
 export const LanguageContext = createContext({
   currentLanguage: "en",
   changeLanguage: () => {},
   languages: SUPPORTED_LANGUAGES,
+  translate: async (text, sourceLang = "en") => text,
+  translateBatch: async (texts, sourceLang = "en") => texts,
 });
 
 const LANGUAGE_PREFERENCE_KEY = "medikiosk_language";
@@ -35,119 +51,66 @@ function getSavedLanguagePreference() {
     : "en";
 }
 
-/**
- * Cookie helpers for Google Translate element integration
- */
-function setGoogleTranslateCookie(langCode) {
+// Clear any lingering Google Translate cookies from browser history
+function clearLegacyGoogleTranslateCookies() {
   if (typeof document === "undefined") return;
-  const cookieValue = langCode === "en" ? "/en/en" : `/en/${langCode}`;
-  document.cookie = `googtrans=${cookieValue}; path=/;`;
-  
-  // Set on top-level domain if applicable
+  const cookiePath = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+  document.cookie = cookiePath;
   const host = window.location.hostname;
+  document.cookie = `${cookiePath} domain=${host};`;
+  document.cookie = `${cookiePath} domain=.${host};`;
   if (host && host !== "localhost" && !host.startsWith("127.")) {
     const parts = host.split(".");
     if (parts.length > 1) {
-      document.cookie = `googtrans=${cookieValue}; path=/; domain=.${parts.slice(-2).join(".")};`;
+      document.cookie = `${cookiePath} domain=.${parts.slice(-2).join(".")};`;
     }
   }
-}
-
-function clearGoogleTranslateCookie() {
-  if (typeof document === "undefined") return;
-  document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-  const host = window.location.hostname;
-  if (host && host !== "localhost" && !host.startsWith("127.")) {
-    const parts = host.split(".");
-    if (parts.length > 1) {
-      document.cookie = `googtrans=; path=/; domain=.${parts.slice(-2).join(".")}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
-    }
-  }
-}
-
-function triggerGoogleTranslateCombo(langCode) {
-  if (typeof document === "undefined") return false;
-  const select = document.querySelector(".goog-te-combo");
-  if (select) {
-    select.value = langCode;
-    select.dispatchEvent(new Event("change"));
-    return true;
-  }
-  return false;
 }
 
 export function LanguageProvider({ children }) {
   const { user } = useAuth();
-  const [, startTransition] = useTransition();
+  const lastSyncedUserRef = useRef(null);
 
   const [currentLanguage, setCurrentLanguage] = useState(() => {
     return getSavedLanguagePreference();
   });
 
-  // Apply Google Translate translation whenever currentLanguage changes or widget becomes ready
+  // Clear any legacy Google Translate cookies on initialization
   useEffect(() => {
-    if (currentLanguage === "en") {
-      clearGoogleTranslateCookie();
-      setGoogleTranslateCookie("en");
-      triggerGoogleTranslateCombo("en");
-    } else {
-      setGoogleTranslateCookie(currentLanguage);
-      triggerGoogleTranslateCombo(currentLanguage);
-    }
+    clearLegacyGoogleTranslateCookies();
+  }, []);
 
-    // Interval to ensure late-loading Google Translate widget applies the language
-    const timer = setInterval(() => {
-      const success = triggerGoogleTranslateCombo(currentLanguage);
-      if (success) {
-        clearInterval(timer);
-      }
-    }, 500);
-
-    const timeout = setTimeout(() => clearInterval(timer), 8000);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(timeout);
-    };
+  // Update universal DOM translator whenever language changes
+  useEffect(() => {
+    setDomTranslatorLanguage(currentLanguage);
   }, [currentLanguage]);
 
-  // A patient's saved profile preference is the source of truth after sign-in.
-  // Guests and users without a preference stay with their explicitly saved local choice,
-  // which defaults to English on first visit.
+  // Sync initial language preference when user first logs in
   useEffect(() => {
-    const patientLang =
-      user?.patient?.preferences?.preferredLanguage ||
-      user?.patient?.preferredLanguage ||
-      user?.preferredLanguage;
-    if (patientLang && SUPPORTED_LANGUAGES.some((l) => l.code === patientLang)) {
-      if (currentLanguage !== patientLang) {
+    const userId = user?.id || user?._id;
+    if (userId && lastSyncedUserRef.current !== userId) {
+      lastSyncedUserRef.current = userId;
+      const patientLang =
+        user?.patient?.preferences?.preferredLanguage ||
+        user?.patient?.preferredLanguage ||
+        user?.preferredLanguage;
+      if (patientLang && SUPPORTED_LANGUAGES.some((l) => l.code === patientLang)) {
         setCurrentLanguage(patientLang);
         localStorage.setItem(LANGUAGE_PREFERENCE_KEY, patientLang);
         localStorage.setItem(LANGUAGE_PREFERENCE_CONFIRMED_KEY, "true");
       }
     }
-  }, [user, currentLanguage]);
+  }, [user]);
 
   const changeLanguage = useCallback(
     async (langCode) => {
       if (!SUPPORTED_LANGUAGES.some((l) => l.code === langCode)) return;
 
-      startTransition(() => {
-        setCurrentLanguage(langCode);
-      });
+      setCurrentLanguage(langCode);
 
       if (typeof window !== "undefined") {
         localStorage.setItem(LANGUAGE_PREFERENCE_KEY, langCode);
         localStorage.setItem(LANGUAGE_PREFERENCE_CONFIRMED_KEY, "true");
-      }
-
-      if (langCode === "en") {
-        clearGoogleTranslateCookie();
-        setGoogleTranslateCookie("en");
-        triggerGoogleTranslateCombo("en");
-      } else {
-        setGoogleTranslateCookie(langCode);
-        triggerGoogleTranslateCombo(langCode);
       }
 
       // If user is authenticated, persist preferred language to patient profile
@@ -162,12 +125,28 @@ export function LanguageProvider({ children }) {
     [user]
   );
 
+  const translate = useCallback(
+    async (text, sourceLang = "en") => {
+      return translationService.translateText(text, currentLanguage, sourceLang);
+    },
+    [currentLanguage]
+  );
+
+  const translateBatch = useCallback(
+    async (texts, sourceLang = "en") => {
+      return translationService.translateBatch(texts, currentLanguage, sourceLang);
+    },
+    [currentLanguage]
+  );
+
   return (
     <LanguageContext.Provider
       value={{
         currentLanguage,
         changeLanguage,
         languages: SUPPORTED_LANGUAGES,
+        translate,
+        translateBatch,
       }}
     >
       {children}

@@ -9,6 +9,7 @@ import {
 } from "@remixicon/react";
 
 import { AppShell } from "../components/AppShell";
+import { TranslatedText } from "../components/common/TranslatedText";
 
 export function Welcome({ go }) {
   const navigate = useNavigate();
@@ -29,35 +30,35 @@ export function Welcome({ go }) {
           {/* Eyebrow */}
           <div className="mb-4 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-[#0c5e5b] uppercase">
             <RiStethoscopeLine className="size-4" />
-            <span>YOUR HEALTH, YOUR WAY</span>
+            <span><TranslatedText text="YOUR HEALTH, YOUR WAY" /></span>
           </div>
 
           {/* Headline */}
           <h1 className="mb-6 text-[clamp(2.8rem,5.5vw,4.6rem)] font-bold leading-[1.04] tracking-[-0.03em] text-[#143337]">
-            Healthcare that
+            <TranslatedText text="Healthcare that" />
             <br />
-            listens.
+            <TranslatedText text="listens." />
           </h1>
 
           {/* Subtitle */}
           <p className="mb-2 text-xl font-bold text-[#143337]">
-            Your Smart Healthcare Assistant
+            <TranslatedText text="Your Smart Healthcare Assistant" />
           </p>
 
           {/* Description */}
           <p className="mb-8 max-w-md text-base leading-relaxed text-[#5d7c80]">
-            Get started with a simple and accessible healthcare experience, made for you.
+            <TranslatedText text="Get started with a simple and accessible healthcare experience, made for you." />
           </p>
 
           {/* Trust Checkmarks */}
           <div className="flex flex-wrap items-center gap-6">
             <div className="inline-flex items-center gap-2 text-xs font-bold text-[#143337]">
               <RiCheckboxCircleFill className="size-4 text-[#0c5e5b]" />
-              <span>Simple to use</span>
+              <span><TranslatedText text="Simple to use" /></span>
             </div>
             <div className="inline-flex items-center gap-2 text-xs font-bold text-[#143337]">
               <RiCheckboxCircleFill className="size-4 text-[#0c5e5b]" />
-              <span>Your privacy matters</span>
+              <span><TranslatedText text="Your privacy matters" /></span>
             </div>
           </div>
         </div>
@@ -66,10 +67,10 @@ export function Welcome({ go }) {
         <div className="w-full max-w-[460px] rounded-[28px] border border-[#e8f1ed] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] sm:p-10 lg:ml-auto">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-[#143337]">
-              How would you like to begin?
+              <TranslatedText text="How would you like to begin?" />
             </h2>
             <p className="mt-1.5 text-sm text-[#5d7c80]">
-              Choose an option to continue.
+              <TranslatedText text="Choose an option to continue." />
             </p>
           </div>
 
@@ -85,10 +86,10 @@ export function Welcome({ go }) {
               </span>
               <div>
                 <strong className="block text-base font-bold text-[#143337]">
-                  Login
+                  <TranslatedText text="Login" />
                 </strong>
                 <span className="block text-xs text-[#5d7c80] mt-0.5">
-                  Sign in for patients and medical staff
+                  <TranslatedText text="Sign in for patients and medical staff" />
                 </span>
               </div>
             </div>
@@ -107,10 +108,10 @@ export function Welcome({ go }) {
               </span>
               <div>
                 <strong className="block text-base font-bold text-[#143337]">
-                  Register patient
+                  <TranslatedText text="Register patient" />
                 </strong>
                 <span className="block text-xs text-[#5d7c80] mt-0.5">
-                  Create your MediKiosk profile
+                  <TranslatedText text="Create your MediKiosk profile" />
                 </span>
               </div>
             </div>
@@ -122,10 +123,10 @@ export function Welcome({ go }) {
             <RiShieldCheckLine className="mt-0.5 size-4 shrink-0 text-[#0c5e5b]" />
             <div>
               <strong className="block text-xs font-bold text-[#143337]">
-                Your information stays private
+                <TranslatedText text="Your information stays private" />
               </strong>
               <span className="mt-0.5 block text-xs text-[#5d7c80]">
-                We only collect what helps us care for you.
+                <TranslatedText text="We only collect what helps us care for you." />
               </span>
             </div>
           </div>

@@ -19,6 +19,12 @@ export const env = {
   cloudinaryCloudName: process.env.CLOUD_NAME,
   cloudinaryApiKey: process.env.CLOUD_API_KEY,
   cloudinaryApiSecret: process.env.CLOUD_API_SECRET,
+  bhashiniUserId: process.env.BHASHINI_USER_ID,
+  bhashiniUlcaApiKey: process.env.BHASHINI_ULCA_API_KEY,
+  bhashiniInferenceApiKey: process.env.BHASHINI_INFERENCE_API_KEY,
+  bhashiniPipelineId: process.env.BHASHINI_PIPELINE_ID || "64392f96daac50000a304e41",
+  sarvamApiKey: process.env.SARVAM_API_KEY,
+  geminiApiKey: process.env.GEMINI_API_KEY,
   isProduction: process.env.NODE_ENV === "production",
 };
 

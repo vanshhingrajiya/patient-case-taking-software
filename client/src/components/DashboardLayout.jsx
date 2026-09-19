@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 import { getNavigationForRole } from "../constants/navigation";
 import { ROLE_LABELS } from "../constants/roles";
 import { LanguageSelector } from "./LanguageSelector";
+import { TranslatedText } from "./common/TranslatedText";
 import { createPortal } from "react-dom";
 
 const LocalStorageDebugger = () => {
@@ -44,7 +45,7 @@ const LocalStorageDebugger = () => {
 
   return (
     <>
-      <button 
+      <button
         type="button"
         onClick={handleOpen}
         className="rounded-lg bg-orange-100 px-3 py-1.5 text-[0.65rem] font-bold text-orange-700 hover:bg-orange-200 shadow-xs cursor-pointer"
@@ -240,34 +241,33 @@ export function DashboardLayout({
             const Icon = item.icon;
             const active = isItemActive(item.path);
 
-            const commonClasses = `group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#0c5e5b] cursor-pointer ${
-              active
+            const commonClasses = `group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#0c5e5b] cursor-pointer ${active
                 ? "bg-[#e2f2ef] text-[#0c5e5b] font-semibold shadow-2xs"
                 : "text-gray-600 hover:bg-[#f4f9f7] hover:text-gray-900"
-            }`;
+              }`;
 
             const itemContent = (
               <>
                 <div className="flex items-center gap-3 min-w-0">
                   {Icon && (
                     <Icon
-                      className={`size-5 shrink-0 transition-colors ${
-                        active
+                      className={`size-5 shrink-0 transition-colors ${active
                           ? "text-[#0c5e5b]"
                           : "text-gray-400 group-hover:text-gray-600"
-                      }`}
+                        }`}
                       aria-hidden="true"
                     />
                   )}
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate">
+                    <TranslatedText text={item.label} />
+                  </span>
                 </div>
                 {item.badge && (
                   <span
-                    className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                      active
+                    className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${active
                         ? "bg-[#0c5e5b] text-white"
                         : "bg-gray-100 text-gray-600"
-                    }`}
+                      }`}
                   >
                     {item.badge}
                   </span>
@@ -358,9 +358,8 @@ export function DashboardLayout({
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation drawer"
@@ -373,7 +372,7 @@ export function DashboardLayout({
          ======================================================== */}
       <div className="flex min-h-screen flex-col lg:pl-64">
         {/* Sticky Top Bar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-gray-200 bg-white/95 px-4 backdrop-blur-md sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/95 px-4 backdrop-blur-md sm:px-6 lg:px-8">
           {/* Left section: mobile hamburger & MediKiosk branding */}
           <div className="flex items-center gap-3">
             {/* Mobile menu button */}
@@ -401,7 +400,7 @@ export function DashboardLayout({
                 <>
                   <span className="text-gray-300 font-light">/</span>
                   <span className="text-sm font-semibold text-gray-700 hidden sm:inline-block">
-                    {title}
+                    <TranslatedText text={title} />
                   </span>
                 </>
               )}
@@ -411,7 +410,7 @@ export function DashboardLayout({
           {/* Right section: Language selector, User / Account section & Logout icon button */}
           <div className="flex items-center gap-2.5 sm:gap-4">
             <LocalStorageDebugger />
-            
+
             {/* Language Selector next to profile */}
             <LanguageSelector />
 

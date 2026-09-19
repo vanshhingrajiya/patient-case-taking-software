@@ -11,6 +11,7 @@ import {
 } from "@remixicon/react";
 
 import { AppShell } from "../components/AppShell";
+import { TranslatedText } from "../components/common/TranslatedText";
 import { login as apiLogin, requestPatientOtp, verifyPatientOtp } from "../services/auth.service";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -132,20 +133,21 @@ export function Login({ go, onAuthenticated }) {
           {/* Eyebrow */}
           <div className="mb-4 inline-flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-[#0c5e5b] uppercase">
             <RiHeartPulseLine className="size-4" />
-            <span>{mode === "patient" ? "PATIENT ACCESS" : "DOCTOR ACCESS"}</span>
+            <span>
+              <TranslatedText text={mode === "patient" ? "PATIENT ACCESS" : "DOCTOR ACCESS"} />
+            </span>
           </div>
 
           {/* Heading */}
           <h1 className="mb-6 text-[clamp(2.8rem,5.5vw,4.6rem)] font-bold leading-[1.04] tracking-[-0.03em] text-[#143337]">
-            Welcome
+            <TranslatedText text="Welcome" />
             <br />
-            back.
+            <TranslatedText text="back." />
           </h1>
 
           {/* Subtitle */}
           <p className="max-w-md text-base leading-relaxed text-[#5d7c80]">
-            Pick up where you left off. Your health
-            <br className="hidden sm:inline" /> profile is ready when you are.
+            <TranslatedText text="Pick up where you left off. Your health profile is ready when you are." />
           </p>
         </div>
 
@@ -158,28 +160,35 @@ export function Login({ go, onAuthenticated }) {
             onClick={() => handleNavigate("/")}
           >
             <RiArrowLeftSLine className="size-4 transition-transform group-hover:-translate-x-0.5" />
-            <span>Back to welcome</span>
+            <span><TranslatedText text="Back to welcome" /></span>
           </button>
 
           {/* Heading & Subtitle */}
           <h2 className="text-2xl font-bold tracking-tight text-[#143337]">
-            Sign in to MediKiosk
+            <TranslatedText text="Sign in to MediKiosk" />
           </h2>
           <p className="mt-1.5 text-sm text-[#5d7c80]">
-            {mode === "patient"
-              ? "Use the mobile number linked to your profile."
-              : "Use your authorized medical staff credentials."}
+            <TranslatedText
+              text={
+                mode === "patient"
+                  ? "Use the mobile number linked to your profile."
+                  : "Use your authorized medical staff credentials."
+              }
+            />
           </p>
 
           {/* Role Mismatch Notice Banner */}
           {location.state?.roleMismatch && (
             <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs text-amber-900">
               <strong className="block font-bold text-amber-950">
-                Staff Authentication Required
+                <TranslatedText text="Staff Authentication Required" />
               </strong>
               <p className="mt-0.5 text-amber-800 leading-relaxed">
-                The requested URL requires {location.state?.requiredRoles?.map(r => ROLE_LABELS[r] || r).join(" or ") || "staff"} privileges.
-                Please sign in with your authorized credentials below.
+                <TranslatedText
+                  text={`The requested URL requires ${
+                    location.state?.requiredRoles?.map((r) => ROLE_LABELS[r] || r).join(" or ") || "staff"
+                  } privileges. Please sign in with your authorized credentials below.`}
+                />
               </p>
               {user && (
                 <button
@@ -187,7 +196,7 @@ export function Login({ go, onAuthenticated }) {
                   onClick={() => handleNavigate(getRoleDashboardPath(user.role))}
                   className="mt-2.5 inline-flex items-center gap-1 font-bold text-[#0c5e5b] hover:underline cursor-pointer"
                 >
-                  <span>Return to your {ROLE_LABELS[user.role] || user.role} Dashboard</span>
+                  <span><TranslatedText text={`Return to your ${ROLE_LABELS[user.role] || user.role} Dashboard`} /></span>
                   <RiArrowRightLine className="size-3.5" />
                 </button>
               )}
@@ -198,39 +207,41 @@ export function Login({ go, onAuthenticated }) {
           <div className="mt-5 grid grid-cols-2 rounded-xl bg-[#eef5f2] p-1 border border-[#d8e8e2]">
             <button
               type="button"
-              className={`flex h-10 w-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${mode === "patient"
+              className={`flex h-10 w-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                mode === "patient"
                   ? "bg-[#0c5e5b] text-white shadow-xs"
                   : "text-[#5d7c80] hover:text-[#0c5e5b]"
-                }`}
+              }`}
               onClick={() => handleModeChange("patient")}
             >
               <RiUserLine className="size-4" />
-              Patient
+              <TranslatedText text="Patient" />
             </button>
             <button
               type="button"
-              className={`flex h-10 w-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${mode === "doctor"
+              className={`flex h-10 w-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                mode === "doctor"
                   ? "bg-[#0c5e5b] text-white shadow-xs"
                   : "text-[#5d7c80] hover:text-[#0c5e5b]"
-                }`}
+              }`}
               onClick={() => handleModeChange("doctor")}
             >
               <RiStethoscopeLine className="size-4" />
-              Doctor
+              <TranslatedText text="Doctor" />
             </button>
           </div>
 
           {/* Error Message */}
           {error && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-700">
-              {error}
+              <TranslatedText text={error} />
             </div>
           )}
 
           {/* OTP Sent Message */}
           {otpMessage && (
             <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-800">
-              {otpMessage}
+              <TranslatedText text={otpMessage} />
             </div>
           )}
 
@@ -241,7 +252,7 @@ export function Login({ go, onAuthenticated }) {
                 htmlFor="identifier"
                 className="block text-xs font-semibold text-[#143337] mb-1.5"
               >
-                {mode === "patient" ? "Mobile number" : "Doctor email or phone"}{" "}
+                <TranslatedText text={mode === "patient" ? "Mobile number" : "Doctor email or phone"} />{" "}
                 <span className="text-[#e06a3b]">*</span>
               </label>
               <input
@@ -265,14 +276,14 @@ export function Login({ go, onAuthenticated }) {
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-1.5">
                   <label htmlFor="otp" className="block text-xs font-semibold text-[#143337]">
-                    6-Digit OTP <span className="text-[#e06a3b]">*</span>
+                    <TranslatedText text="6-Digit OTP" /> <span className="text-[#e06a3b]">*</span>
                   </label>
                   <button
                     type="button"
                     className="text-xs font-bold text-[#0c5e5b] hover:underline cursor-pointer"
                     onClick={handleRequestOtp}
                   >
-                    Resend code
+                    <TranslatedText text="Resend code" />
                   </button>
                 </div>
                 <input
@@ -287,7 +298,7 @@ export function Login({ go, onAuthenticated }) {
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 />
                 <p className="mt-1.5 text-[0.72rem] text-[#5d7c80]">
-                  Check backend terminal console for the 6-digit verification code.
+                  <TranslatedText text="Check backend terminal console for the 6-digit verification code." />
                 </p>
               </div>
             )}
@@ -299,7 +310,7 @@ export function Login({ go, onAuthenticated }) {
                   htmlFor="password"
                   className="block text-xs font-semibold text-[#143337] mb-1.5"
                 >
-                  Password <span className="text-[#e06a3b]">*</span>
+                  <TranslatedText text="Password" /> <span className="text-[#e06a3b]">*</span>
                 </label>
                 <div className="relative flex items-center">
                   <input
@@ -331,7 +342,7 @@ export function Login({ go, onAuthenticated }) {
             {mode === "doctor" && (
               <div className="mt-3.5 rounded-xl border border-[#d8e8e2] bg-[#f8fcfb] p-3 text-xs text-[#5d7c80]">
                 <span className="font-semibold text-[#143337]">
-                  Quick demo doctor (Password: Doctor@123):
+                  <TranslatedText text="Quick demo doctor (Password: Doctor@123):" />
                 </span>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <button
@@ -366,20 +377,15 @@ export function Login({ go, onAuthenticated }) {
               className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0c5e5b] text-sm font-semibold text-white shadow-xs transition-colors hover:bg-[#084341] cursor-pointer disabled:opacity-60"
             >
               {busy ? (
-                "Please wait..."
+                <TranslatedText text="Please wait..." />
               ) : mode === "patient" && !otpRequested ? (
                 <>
-                  Send OTP
-                  <RiArrowRightLine className="size-4" />
-                </>
-              ) : mode === "patient" ? (
-                <>
-                  Login
+                  <TranslatedText text="Send OTP" />
                   <RiArrowRightLine className="size-4" />
                 </>
               ) : (
                 <>
-                  Login
+                  <TranslatedText text="Login" />
                   <RiArrowRightLine className="size-4" />
                 </>
               )}
@@ -387,13 +393,13 @@ export function Login({ go, onAuthenticated }) {
 
             {/* Bottom Register Prompt */}
             <p className="mt-6 text-center text-xs text-[#5d7c80]">
-              New patient?{" "}
+              <TranslatedText text="New patient?" />{" "}
               <button
                 type="button"
                 className="font-bold text-[#0c5e5b] hover:underline cursor-pointer"
                 onClick={() => handleNavigate("/register")}
               >
-                Register here
+                <TranslatedText text="Register here" />
               </button>
             </p>
           </form>
