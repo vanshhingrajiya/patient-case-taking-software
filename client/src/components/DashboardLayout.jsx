@@ -45,14 +45,14 @@ const LocalStorageDebugger = () => {
 
   return (
     <>
-      <button
+      {/* <button
         type="button"
         onClick={handleOpen}
         className="rounded-lg bg-orange-100 px-3 py-1.5 text-[0.65rem] font-bold text-orange-700 hover:bg-orange-200 shadow-xs cursor-pointer"
         title="Debug LocalStorage"
       >
         DEV: Edit Storage
-      </button>
+      </button> */}
 
       {open && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 sm:p-6" onClick={() => setOpen(false)}>
@@ -242,8 +242,8 @@ export function DashboardLayout({
             const active = isItemActive(item.path);
 
             const commonClasses = `group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#0c5e5b] cursor-pointer ${active
-                ? "bg-[#e2f2ef] text-[#0c5e5b] font-semibold shadow-2xs"
-                : "text-gray-600 hover:bg-[#f4f9f7] hover:text-gray-900"
+              ? "bg-[#e2f2ef] text-[#0c5e5b] font-semibold shadow-2xs"
+              : "text-gray-600 hover:bg-[#f4f9f7] hover:text-gray-900"
               }`;
 
             const itemContent = (
@@ -252,8 +252,8 @@ export function DashboardLayout({
                   {Icon && (
                     <Icon
                       className={`size-5 shrink-0 transition-colors ${active
-                          ? "text-[#0c5e5b]"
-                          : "text-gray-400 group-hover:text-gray-600"
+                        ? "text-[#0c5e5b]"
+                        : "text-gray-400 group-hover:text-gray-600"
                         }`}
                       aria-hidden="true"
                     />
@@ -265,8 +265,8 @@ export function DashboardLayout({
                 {item.badge && (
                   <span
                     className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${active
-                        ? "bg-[#0c5e5b] text-white"
-                        : "bg-gray-100 text-gray-600"
+                      ? "bg-[#0c5e5b] text-white"
+                      : "bg-gray-100 text-gray-600"
                       }`}
                   >
                     {item.badge}

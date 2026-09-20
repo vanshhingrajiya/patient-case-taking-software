@@ -208,7 +208,7 @@ async function translateWithGemini(items, sourceLang, targetLang) {
   if (!env.geminiApiKey) throw new Error("Gemini API key not available");
 
   const genAI = new GoogleGenerativeAI(env.geminiApiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
 
   const prompt = `You are a medical translation engine. Translate the following array of JSON strings from language code "${sourceLang}" into language code "${targetLang}".
 Return ONLY a valid JSON array of strings corresponding to the translations, preserving clinical accuracy.
