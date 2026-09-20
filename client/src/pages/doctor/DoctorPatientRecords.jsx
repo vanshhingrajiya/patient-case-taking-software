@@ -21,26 +21,23 @@ const CustomSelect = ({ value, onChange, options, icon: Icon }) => {
     <div className="relative group z-20" ref={dropdownRef}>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 rounded-xl border pl-3 pr-8 py-2 shadow-xs transition-all cursor-pointer select-none ${
-          isOpen
+        className={`flex items-center gap-2 rounded-xl border pl-3 pr-8 py-2 shadow-xs transition-all cursor-pointer select-none ${isOpen
             ? "border-[#0c5e5b] bg-[#f7fcfb] ring-2 ring-[#0c5e5b]/20"
             : "border-gray-200 bg-white hover:border-[#0c5e5b]/40 hover:bg-[#f7fcfb]"
-        }`}
+          }`}
       >
         {Icon && (
           <Icon
-            className={`size-4 transition-colors ${
-              isOpen ? "text-[#0c5e5b]" : "text-[#0c5e5b]/70 group-hover:text-[#0c5e5b]"
-            }`}
+            className={`size-4 transition-colors ${isOpen ? "text-[#0c5e5b]" : "text-[#0c5e5b]/70 group-hover:text-[#0c5e5b]"
+              }`}
           />
         )}
         <span className="text-xs sm:text-sm font-semibold text-gray-800 whitespace-nowrap">
           {selectedOption.label}
         </span>
         <div
-          className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-[#0c5e5b]" : "text-gray-400 group-hover:text-[#0c5e5b]"
-          }`}
+          className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 transition-transform duration-200 ${isOpen ? "rotate-180 text-[#0c5e5b]" : "text-gray-400 group-hover:text-[#0c5e5b]"
+            }`}
         >
           <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
@@ -57,11 +54,10 @@ const CustomSelect = ({ value, onChange, options, icon: Icon }) => {
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className={`cursor-pointer rounded-lg px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${
-                value === option.value
+              className={`cursor-pointer rounded-lg px-3 py-2 text-xs sm:text-sm font-medium transition-colors ${value === option.value
                   ? "bg-[#e2f2ef] text-[#0c5e5b]"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
+                }`}
             >
               {option.label}
             </div>
@@ -72,6 +68,27 @@ const CustomSelect = ({ value, onChange, options, icon: Icon }) => {
   );
 };
 import { DashboardLayout } from "../../components/DashboardLayout";
+
+const STATIC_DOCUMENT_SUMMARY_JSX = (
+  <div className="text-sm leading-relaxed text-gray-800 space-y-3">
+    <p>
+      Haematology report for a 20-year-old male showing leukopenia and mild thrombocytopenia. Hemoglobin is normal at 13.1 g/dL with normocytic and normochromic RBC morphology.
+    </p>
+    <ul className="list-disc pl-5 space-y-1">
+      <li>
+        Total W.B.C. count is <span className="bg-red-100 text-red-800 font-semibold px-1.5 py-0.5 rounded">decreased at 2,100 /cumm</span> (Reference: 4,000-10,000 /cumm)
+      </li>
+      <li>
+        Platelet count is <span className="bg-red-100 text-red-800 font-semibold px-1.5 py-0.5 rounded">decreased at 1,18,000 /cumm</span> (Reference: 1,50,000-5,00,000 /cumm)
+      </li>
+      <li>Hemoglobin is 13.1 g/dL (Reference: 12.5-15.5 g/dL)</li>
+      <li>Total R.B.C. count is 4.36 mill/cumm (Reference: 4.5-6.2 mill/cumm)</li>
+      <li>H.C.T. is 39.1% (Reference: 40-50%)</li>
+      <li>RBC Morphology: Normochromic and Normocytic</li>
+      <li>WBC Morphology: <span className="bg-red-100 text-red-800 font-semibold px-1.5 py-0.5 rounded">Leucopenia noted</span></li>
+    </ul>
+  </div>
+);
 
 function normalizeSummary(input) {
   let meta = null;
@@ -305,8 +322,8 @@ export function DoctorPatientRecords() {
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(r => 
-        r.id.toLowerCase().includes(q) || 
+      result = result.filter(r =>
+        r.id.toLowerCase().includes(q) ||
         r.name.toLowerCase().includes(q) ||
         r.notes.toLowerCase().includes(q)
       );
@@ -419,205 +436,233 @@ export function DoctorPatientRecords() {
           ) : (
             filteredRecords.map((record) => (
               <article key={record.id} className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xs">
-              <div className="border-b border-gray-100 p-5 sm:p-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#e2f2ef] text-sm font-bold text-[#0c5e5b]">
-                      {record.initials}
-                    </div>
-                    <div>
-                      <h2 className="text-base font-bold text-gray-900">{record.name}</h2>
-                      <p className="text-xs text-gray-500">{record.details}</p>
+                <div className="border-b border-gray-100 p-5 sm:p-6">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#e2f2ef] text-sm font-bold text-[#0c5e5b]">
+                        {record.initials}
+                      </div>
+                      <div>
+                        <h2 className="text-base font-bold text-gray-900">{record.name}</h2>
+                        <p className="text-xs text-gray-500">{record.details}</p>
+                      </div>
                     </div>
                   </div>
-                  <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-teal-50 px-2.5 py-1 text-[0.7rem] font-semibold text-[#0c5e5b]">
-                    <HeartPulse className="size-3.5" />
-                    {record.status}
-                  </span>
+
                 </div>
 
-              </div>
-
-              <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
-                <div className="flex-1 p-5 sm:p-6 flex flex-col bg-[#f8faf9]/30">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[#0c5e5b]">
-                      <Stethoscope className="size-3.5" />
-                      Editable summary
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openPreview(record)}
-                        className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-[0.65rem] font-medium text-[#0c5e5b] transition hover:bg-teal-100 cursor-pointer"
-                        title="Edit Fullscreen"
-                      >
-                        <PencilLine className="size-3" />
-                        Edit
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
-                    {/* Chief Complaint Highlight */}
-                    {(record.sections || parseClinicalSummary(record.summary))?.find((s) => s.title.toLowerCase().includes("chief complaint")) && (
-                      <div className="rounded-2xl border-2 border-[#0c5e5b]/30 bg-gradient-to-r from-[#eef7f5] via-[#f7fcfb] to-[#eef7f5] p-4 sm:p-5 shadow-xs">
-                        <div className="flex items-center gap-2 text-[#0c5e5b] font-bold text-xs uppercase tracking-wider mb-1.5">
-                          <Stethoscope className="size-4" />
-                          <span>Chief Complaint</span>
-                        </div>
-                        <p className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-                          {(record.sections || parseClinicalSummary(record.summary)).find((s) => s.title.toLowerCase().includes("chief complaint"))?.answer}
-                        </p>
+                <div className="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
+                  <div className="flex-1 p-5 sm:p-6 flex flex-col bg-[#f8faf9]/30">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-[#0c5e5b]">
+                        <Stethoscope className="size-3.5" />
+                        Editable summary
                       </div>
-                    )}
-
-                    {/* HPI Card */}
-                    {(record.sections || parseClinicalSummary(record.summary))?.find((s) => s.title.toLowerCase().includes("present illness") || s.title.toLowerCase().includes("hpi")) && (
-                      <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-xs">
-                        <div className="flex items-center gap-2 text-emerald-700 font-bold text-xs uppercase tracking-wider mb-2">
-                          <Activity className="size-4" />
-                          <span>History of Present Illness (HPI)</span>
-                        </div>
-                        <p className="text-sm sm:text-base leading-relaxed text-gray-800 font-normal">
-                          {(record.sections || parseClinicalSummary(record.summary)).find((s) => s.title.toLowerCase().includes("present illness") || s.title.toLowerCase().includes("hpi"))?.answer}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openPreview(record)}
+                          className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-[0.65rem] font-medium text-[#0c5e5b] transition hover:bg-teal-100 cursor-pointer"
+                          title="Edit Fullscreen"
+                        >
+                          <PencilLine className="size-3" />
+                          Edit
+                        </button>
                       </div>
-                    )}
+                    </div>
 
-                    {/* Remaining Sections */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {(record.sections || parseClinicalSummary(record.summary))
-                        .filter(
-                          (s) =>
-                            !s.title.toLowerCase().includes("chief complaint") &&
-                            !s.title.toLowerCase().includes("present illness") &&
-                            !s.title.toLowerCase().includes("hpi")
-                        )
-                        .map((sec, idx) => (
-                          <div
-                            key={idx}
-                            className={`rounded-2xl border border-gray-200/90 bg-white p-4 shadow-xs flex flex-col justify-between ${sec.isList ? "md:col-span-2" : ""
-                              }`}
-                          >
-                            <div>
-                              <div className="flex items-center gap-2 mb-2.5">
-                                <span className="grid size-6 place-items-center rounded-lg bg-gray-100 shrink-0">
-                                  {getSectionIcon(sec.title)}
-                                </span>
-                                <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-800">
-                                  {sec.title}
-                                </h4>
-                              </div>
+                    <div className="mt-4 flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                      {/* Chief Complaint Highlight */}
+                      {(record.sections || parseClinicalSummary(record.summary))?.find((s) => s.title.toLowerCase().includes("chief complaint")) && (
+                        <div className="rounded-2xl border-2 border-[#0c5e5b]/30 bg-gradient-to-r from-[#eef7f5] via-[#f7fcfb] to-[#eef7f5] p-4 sm:p-5 shadow-xs">
+                          <div className="flex items-center gap-2 text-[#0c5e5b] font-bold text-xs uppercase tracking-wider mb-1.5">
+                            <Stethoscope className="size-4" />
+                            <span>Chief Complaint</span>
+                          </div>
+                          <p className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+                            {(record.sections || parseClinicalSummary(record.summary)).find((s) => s.title.toLowerCase().includes("chief complaint"))?.answer}
+                          </p>
+                        </div>
+                      )}
 
-                              {sec.isList ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
-                                  {sec.listItems.map((item, i) => {
-                                    if (item.isKeyValue) {
-                                      const valLower = item.value.toLowerCase();
-                                      const isNeg =
-                                        valLower === "no" ||
-                                        valLower === "never" ||
-                                        valLower === "none" ||
-                                        valLower.includes("no significant");
+                      {/* HPI Card */}
+                      {(record.sections || parseClinicalSummary(record.summary))?.find((s) => s.title.toLowerCase().includes("present illness") || s.title.toLowerCase().includes("hpi")) && (
+                        <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-xs">
+                          <div className="flex items-center gap-2 text-emerald-700 font-bold text-xs uppercase tracking-wider mb-2">
+                            <Activity className="size-4" />
+                            <span>History of Present Illness (HPI)</span>
+                          </div>
+                          <p className="text-sm sm:text-base leading-relaxed text-gray-800 font-normal">
+                            {(record.sections || parseClinicalSummary(record.summary)).find((s) => s.title.toLowerCase().includes("present illness") || s.title.toLowerCase().includes("hpi"))?.answer}
+                          </p>
+                        </div>
+                      )}
 
+                      {/* Remaining Sections */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {(record.sections || parseClinicalSummary(record.summary))
+                          .filter(
+                            (s) =>
+                              !s.title.toLowerCase().includes("chief complaint") &&
+                              !s.title.toLowerCase().includes("present illness") &&
+                              !s.title.toLowerCase().includes("hpi")
+                          )
+                          .map((sec, idx) => (
+                            <div
+                              key={idx}
+                              className={`rounded-2xl border border-gray-200/90 bg-white p-4 shadow-xs flex flex-col justify-between ${sec.isList ? "md:col-span-2" : ""
+                                }`}
+                            >
+                              <div>
+                                <div className="flex items-center gap-2 mb-2.5">
+                                  <span className="grid size-6 place-items-center rounded-lg bg-gray-100 shrink-0">
+                                    {getSectionIcon(sec.title)}
+                                  </span>
+                                  <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-800">
+                                    {sec.title}
+                                  </h4>
+                                </div>
+
+                                {sec.isList ? (
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
+                                    {sec.listItems.map((item, i) => {
+                                      if (item.isKeyValue) {
+                                        const valLower = item.value.toLowerCase();
+                                        const isNeg =
+                                          valLower === "no" ||
+                                          valLower === "never" ||
+                                          valLower === "none" ||
+                                          valLower.includes("no significant");
+
+                                        return (
+                                          <div
+                                            key={i}
+                                            className="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-200/80 px-3 py-2 text-xs"
+                                          >
+                                            <span className="font-semibold text-gray-700">{item.key}</span>
+                                            <span
+                                              className={`rounded-md px-2 py-0.5 font-bold text-[11px] ${isNeg
+                                                ? "bg-gray-200/80 text-gray-600"
+                                                : "bg-[#e2f2ef] text-[#0c5e5b]"
+                                                }`}
+                                            >
+                                              {item.value}
+                                            </span>
+                                          </div>
+                                        );
+                                      }
                                       return (
                                         <div
                                           key={i}
-                                          className="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-200/80 px-3 py-2 text-xs"
+                                          className="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200/80 px-3 py-2 text-xs font-medium text-gray-800"
                                         >
-                                          <span className="font-semibold text-gray-700">{item.key}</span>
-                                          <span
-                                            className={`rounded-md px-2 py-0.5 font-bold text-[11px] ${isNeg
-                                              ? "bg-gray-200/80 text-gray-600"
-                                              : "bg-[#e2f2ef] text-[#0c5e5b]"
-                                              }`}
-                                          >
-                                            {item.value}
-                                          </span>
+                                          <span className="size-1.5 rounded-full bg-[#0c5e5b] shrink-0" />
+                                          <span>{item.raw}</span>
                                         </div>
                                       );
-                                    }
-                                    return (
-                                      <div
-                                        key={i}
-                                        className="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200/80 px-3 py-2 text-xs font-medium text-gray-800"
-                                      >
-                                        <span className="size-1.5 rounded-full bg-[#0c5e5b] shrink-0" />
-                                        <span>{item.raw}</span>
-                                      </div>
-                                    );
-                                  })}
+                                    })}
+                                  </div>
+                                ) : sec.isNoneOrNegative ? (
+                                  <div className="inline-flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600">
+                                    <span className="size-2 rounded-full bg-gray-400" />
+                                    <span>{sec.answer}</span>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm leading-relaxed text-gray-800 font-medium whitespace-pre-wrap">
+                                    {sec.answer}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+
+                    <p className="mt-3 text-xs leading-5 text-gray-500">{record.notes}</p>
+                  </div>
+
+                  <div className="flex-1 p-5 sm:p-6 bg-white">
+                    <div className="flex items-center gap-2">
+                      <FileText className="size-4 text-[#0c5e5b]" />
+                      <h3 className="text-sm font-bold text-gray-900">Medical documents</h3>
+                    </div>
+
+                    <div className="relative mt-4 ml-1">
+                      <div className="absolute left-[8px] top-1 bottom-1 w-px bg-gradient-to-b from-[#0c5e5b] via-[#69b0a8] to-[#dfeae8]" />
+
+                      <div className="space-y-4">
+                        {record.documents.map((document, idx) => (
+                          <div key={`${record.id}-${document.time}-${document.title}`} className="relative flex gap-4">
+                            <span
+                              className={`relative z-10 mt-0.5 flex size-4 shrink-0 rounded-full border-2 border-white shadow-sm ${idx === 0 ? "bg-[#0c5e5b] shadow-[0_0_0_4px_rgba(12,94,91,0.12)]" : "bg-[#51a9a1]"
+                                }`}
+                            />
+
+                            <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 text-[0.68rem] font-medium text-gray-500">
+                                <Clock3 className="size-3 text-gray-400" />
+                                {document.time}
+                              </span>
+                              <div className="rounded-xl border border-gray-200 bg-[#f9fbfa] p-3">
+                                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => setSelectedDocument({ recordId: record.id, doc: document })}
+                                      className="text-xs font-semibold text-gray-800 hover:text-[#0c5e5b] transition text-left cursor-pointer"
+                                    >
+                                      {document.title}
+                                    </button>
+                                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-medium capitalize ${document.status === "critical" ? "bg-red-100 text-red-700" :
+                                      document.status === "abnormal" ? "bg-amber-100 text-amber-800" :
+                                        document.status === "normal" ? "bg-emerald-100 text-emerald-700" :
+                                          "bg-teal-50 text-[#0c5e5b]"
+                                      }`}>
+                                      {document.status}
+                                    </span>
+                                  </div>
                                 </div>
-                              ) : sec.isNoneOrNegative ? (
-                                <div className="inline-flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600">
-                                  <span className="size-2 rounded-full bg-gray-400" />
-                                  <span>{sec.answer}</span>
-                                </div>
-                              ) : (
-                                <p className="text-sm leading-relaxed text-gray-800 font-medium whitespace-pre-wrap">
-                                  {sec.answer}
-                                </p>
-                              )}
+                                <p className="mt-2 text-xs text-gray-500">{document.description}</p>
+                              </div>
                             </div>
                           </div>
                         ))}
-                    </div>
-                  </div>
 
-                  <p className="mt-3 text-xs leading-5 text-gray-500">{record.notes}</p>
-                </div>
-
-                <div className="flex-1 p-5 sm:p-6 bg-white">
-                  <div className="flex items-center gap-2">
-                    <FileText className="size-4 text-[#0c5e5b]" />
-                    <h3 className="text-sm font-bold text-gray-900">Medical documents</h3>
-                  </div>
-
-                  <div className="relative mt-4 ml-1">
-                    <div className="absolute left-[8px] top-1 bottom-1 w-px bg-gradient-to-b from-[#0c5e5b] via-[#69b0a8] to-[#dfeae8]" />
-
-                    <div className="space-y-4">
-                      {record.documents.map((document, idx) => (
-                        <div key={`${record.id}-${document.time}-${document.title}`} className="relative flex gap-4">
-                          <span
-                            className={`relative z-10 mt-0.5 flex size-4 shrink-0 rounded-full border-2 border-white shadow-sm ${idx === 0 ? "bg-[#0c5e5b] shadow-[0_0_0_4px_rgba(12,94,91,0.12)]" : "bg-[#51a9a1]"
-                              }`}
-                          />
-
-                          <div className="min-w-0 flex-1 flex flex-col gap-1.5">
-                            <span className="inline-flex items-center gap-1.5 text-[0.68rem] font-medium text-gray-500">
-                              <Clock3 className="size-3 text-gray-400" />
-                              {document.time}
-                            </span>
-                            <div className="rounded-xl border border-gray-200 bg-[#f9fbfa] p-3">
-                              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => setSelectedDocument({ recordId: record.id, doc: document })}
-                                    className="text-xs font-semibold text-gray-800 hover:text-[#0c5e5b] transition text-left cursor-pointer"
-                                  >
-                                    {document.title}
-                                  </button>
-                                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-medium capitalize ${document.status === "critical" ? "bg-red-100 text-red-700" :
-                                    document.status === "abnormal" ? "bg-amber-100 text-amber-800" :
-                                      document.status === "normal" ? "bg-emerald-100 text-emerald-700" :
-                                        "bg-teal-50 text-[#0c5e5b]"
-                                    }`}>
-                                    {document.status}
-                                  </span>
+                        {/* Mock Documents from Upload Zone */}
+                        {[
+                          { title: "prescription_dr_gupta.jpg", size: "0.2 MB", desc: "Image Document", status: "review" },
+                          { title: "apollo_pharmacy_bill.pdf", size: "0.2 MB", desc: "PDF Document", status: "review" },
+                          { title: "blood_test_report.pdf", size: "1.3 MB", desc: "PDF Document", status: "abnormal" }
+                        ].map((mockDoc, idx) => (
+                          <div key={`mock-doc-${idx}`} className="relative flex gap-4">
+                            <span className="relative z-10 mt-0.5 flex size-4 shrink-0 rounded-full border-2 border-white shadow-sm bg-[#51a9a1]" />
+                            <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+                              <span className="inline-flex items-center gap-1.5 text-[0.68rem] font-medium text-gray-500">
+                                <Clock3 className="size-3 text-gray-400" />
+                                Static Mock Document
+                              </span>
+                              <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-xs">
+                                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold text-gray-800">{mockDoc.title}</span>
+                                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.65rem] font-medium capitalize ${mockDoc.status === "abnormal" ? "bg-amber-100 text-amber-800" : "bg-teal-50 text-[#0c5e5b]"}`}>
+                                      {mockDoc.status}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="mt-2 flex items-center justify-between">
+                                  <p className="text-xs text-gray-500">{mockDoc.desc}</p>
+                                  <span className="text-[0.65rem] font-medium text-gray-400">{mockDoc.size}</span>
                                 </div>
                               </div>
-                              <p className="mt-2 text-xs text-gray-500">{document.description}</p>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          )))}
+              </article>
+            )))}
         </div>
       </div>
 
@@ -719,14 +764,10 @@ export function DoctorPatientRecords() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Summary</label>
-                  <textarea
-                    value={selectedDocument.doc.summary || ""}
-                    onChange={(e) => handleDocumentUpdate("summary", e.target.value)}
-                    rows={10}
-                    className="w-full resize-none rounded-lg border border-gray-200 bg-[#f9fbfa] px-3 py-2 text-sm leading-6 text-gray-800 shadow-sm outline-none transition focus:border-[#0c5e5b] focus:ring-1 focus:ring-[#0c5e5b]"
-                    placeholder="Enter document summary..."
-                  />
+                  <label className="block text-xs font-semibold text-gray-700 mb-2">Summary</label>
+                  <div className="w-full rounded-lg border border-gray-200 bg-[#f9fbfa] px-4 py-3 shadow-sm">
+                    {STATIC_DOCUMENT_SUMMARY_JSX}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center justify-end gap-3 border-t border-gray-100 bg-gray-50 p-4">
